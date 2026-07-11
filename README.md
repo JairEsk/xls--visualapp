@@ -1,23 +1,23 @@
 # xls--visualapp (Pape)
 
-Aplicación de escritorio (Electron) para gestionar el inventario de una papelería/tienda de artículos escolares y de oficina, usando **Excel (.xlsx) como base de datos**. Permite agregar, buscar, editar y eliminar productos, detectar duplicados por código de barras, y ver alertas de bajo stock — todo desde una interfaz visual sin tocar el Excel directamente.
+Desktop application (Electron) for managing inventory of a stationery/office-supply store, using **Excel (.xlsx) as the database**. It lets you add, search, edit, and delete products, detect duplicates by barcode, and see low-stock alerts — all from a visual UI without touching the Excel file directly.
 
-## Características
+## Features
 
-- **Explorador**: busca o escanea un producto para ver su precio al instante.
-- **Inventario**: alta, edición y baja de productos (nombre, categoría, precio de compra/venta, stock, venta por caja).
-- **Autocompletado por código de barras**: al escribir un código de barras existente, el formulario se llena automáticamente (nombre, categoría, precios, stock, ganancia) para evitar productos duplicados durante la captura de inventario.
-- **Restock**: lista de productos con stock bajo (≤ 5 unidades) para saber qué reabastecer.
-- **Multi-proyecto**: crea y cambia entre varias "bases de datos" (archivos `.xlsx` independientes) desde la app.
-- **Importar / Exportar** archivos Excel.
-- **Bilingüe**: interfaz en español e inglés (botón ES/EN).
+- **Explorer**: search or scan a product to see its price instantly.
+- **Inventory**: add, edit, and remove products (name, category, purchase/sale price, stock, sold by box).
+- **Barcode autofill**: typing an existing barcode automatically fills the form (name, category, prices, stock, profit) to prevent duplicate products during inventory entry.
+- **Restock**: list of low-stock products (≤ 5 units) so you know what needs restocking.
+- **Multi-project**: create and switch between several "databases" (independent `.xlsx` files) from the app.
+- **Import / Export** Excel files.
+- **Bilingual**: UI available in English and Spanish (ES/EN toggle).
 
-## Requisitos
+## Requirements
 
-- [Node.js](https://nodejs.org/) 18 o superior
+- [Node.js](https://nodejs.org/) 18 or higher
 - npm
 
-## Instalación
+## Installation
 
 ```bash
 git clone https://github.com/JairEsk/xls--visualapp.git
@@ -25,50 +25,50 @@ cd xls--visualapp
 npm install
 ```
 
-## Uso
+## Usage
 
 ```bash
 npm start
 ```
 
-Esto abre la aplicación de escritorio (Electron). Al iniciar por primera vez, se crea automáticamente un archivo `data/products.xlsx` que actúa como base de datos.
+This launches the desktop app (Electron). On first run, a `data/products.xlsx` file is created automatically and acts as the database.
 
-## Estructura del proyecto
+## Project structure
 
 ```
-├── main.js              # Proceso principal de Electron (ventana, IPC, diálogos)
-├── preload.js           # Puente seguro entre el proceso principal y el renderer
-├── database.js          # Lectura/escritura del Excel (capa de "base de datos")
+├── main.js              # Electron main process (window, IPC, dialogs)
+├── preload.js           # Secure bridge between main process and renderer
+├── database.js          # Excel read/write ("database" layer)
 ├── renderer/
-│   ├── index.html       # Interfaz (pestañas: Explorador, Inventario, Restock, Ayuda)
-│   ├── renderer.js       # Lógica de UI, i18n, tabla, formulario, autocompletado
-│   └── styles.css        # Estilos
-├── data/                 # Archivos .xlsx generados en tiempo de ejecución (ignorados por git)
+│   ├── index.html       # UI (tabs: Explorer, Inventory, Restock, Help)
+│   ├── renderer.js       # UI logic, i18n, table, form, autofill
+│   └── styles.css        # Styles
+├── data/                 # Runtime-generated .xlsx files (git-ignored)
 └── package.json
 ```
 
-## Formato del Excel
+## Excel format
 
-Si prefieres preparar un archivo Excel manualmente en lugar de usar el formulario de la app, debe tener estas columnas (ver también la pestaña **Ayuda** dentro de la app):
+If you prefer to prepare an Excel file manually instead of using the app's form, it must have these columns (also shown in the **Help** tab inside the app):
 
-| Columna              | Tipo        | Descripción                          |
-|----------------------|-------------|---------------------------------------|
-| `id`                 | texto       | Identificador único del producto      |
-| `barcode`            | texto       | Código de barras (UPC/EAN)            |
-| `name`               | texto       | Nombre del producto                   |
-| `category`           | texto       | Categoría                             |
-| `purchase_price`     | número      | Precio de compra por unidad           |
-| `sale_price`         | número      | Precio de venta por unidad            |
-| `stock`              | número      | Unidades en inventario                |
-| `sold_by_box`        | true/false  | Si también se vende por caja          |
-| `box_units`          | número      | Unidades por caja                     |
-| `box_purchase_price` | número      | Precio de compra de la caja           |
-| `box_sale_price`     | número      | Precio de venta de la caja            |
+| Column               | Type        | Description                        |
+|-----------------------|-------------|--------------------------------------|
+| `id`                 | text        | Unique product identifier            |
+| `barcode`            | text        | Product barcode (UPC/EAN)            |
+| `name`               | text        | Product name                         |
+| `category`           | text        | Category                             |
+| `purchase_price`     | number      | Unit purchase price                  |
+| `sale_price`         | number      | Unit sale price                      |
+| `stock`              | number      | Units in inventory                   |
+| `sold_by_box`        | true/false  | Whether also sold by box             |
+| `box_units`          | number      | Units per box                        |
+| `box_purchase_price` | number      | Box purchase price                   |
+| `box_sale_price`     | number      | Box sale price                       |
 
-## Empaquetado (build)
+## Packaging (build)
 
-Este proyecto todavía no incluye configuración de empaquetado (por ejemplo, `electron-builder`). Para generar un instalador, se recomienda agregar una herramienta como [electron-builder](https://www.electron.build/) o [electron-forge](https://www.electronforge.io/).
+This project doesn't yet include packaging configuration (e.g. `electron-builder`). To generate an installer, consider adding a tool such as [electron-builder](https://www.electron.build/) or [electron-forge](https://www.electronforge.io/).
 
-## Licencia
+## License
 
 MIT

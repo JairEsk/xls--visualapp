@@ -1,0 +1,14 @@
+node_modules/
+dist/
+build/
+out/
+
+# Runtime data (Excel acts as the database; generated automatically on first run)
+data/*.xlsx
+!data/.gitkeep
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+*.log

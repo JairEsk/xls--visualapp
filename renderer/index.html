@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'">
+  <title>Stationery Manager</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <h1 class="store-title" id="storeTitle" title="Click to rename">Stationery Manager</h1>
+      <span class="edit-icon" id="editTitleBtn">&#9998;</span>
+    </div>
+    <div class="header-center">
+      <nav class="tabs-nav">
+        <button class="tab active" data-tab="explorer" id="tabExplorerBtn">Explorer</button>
+        <button class="tab" data-tab="inventory" id="tabInventoryBtn">Inventory</button>
+        <button class="tab" data-tab="restock" id="tabRestockBtn">Restock</button>
+        <button class="tab" data-tab="help" id="tabHelpBtn">Help</button>
+      </nav>
+    </div>
+    <div class="header-actions">
+      <span id="dbNameLabel" class="db-name-label"></span>
+      <button id="btnNew" class="btn btn-ghost-light">New</button>
+      <button id="btnExport" class="btn btn-ghost-light">Export</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- TAB: EXPLORER -->
+    <section class="tab-panel" id="tab-explorer">
+      <div class="explorer-container">
+        <div class="explorer-search-box">
+          <span class="explorer-search-icon">&#128269;</span>
+          <input type="text" id="explorerSearch" placeholder="Search or scan product..." autofocus>
+        </div>
+        <div class="explorer-results" id="explorerResults">
+          <div class="explorer-empty">Search for a product to see its price.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB: INVENTORY -->
+    <section class="tab-panel hidden" id="tab-inventory">
+      <!-- Add/Edit Form -->
+      <div class="panel panel-form">
+        <h2 id="formTitle">Add Product</h2>
+        <form id="productForm">
+          <input type="hidden" id="editingId">
+          <div class="form-row">
+            <input type="hidden" id="id">
+            <div class="form-group">
+              <label for="barcode">Barcode</label>
+              <input type="text" id="barcode" placeholder="e.g. 7501234567890">
+            </div>
+            <div class="form-group flex-2">
+              <label for="name">Name</label>
+              <input type="text" id="name" placeholder="e.g. HB #2 Pencil" required>
+            </div>
+            <div class="form-group">
+              <label for="category">Category</label>
+              <select id="category">
+                <option value="">Select...</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="purchasePrice">Purchase Price</label>
+              <input type="number" id="purchasePrice" placeholder="0.00" step="0.01" min="0" required>
+            </div>
+            <div class="form-group">
+              <label for="salePrice">Sale Price</label>
+              <input type="number" id="salePrice" placeholder="0.00" step="0.01" min="0" required>
+            </div>
+            <div class="form-group">
+              <label for="stock">Stock</label>
+              <input type="number" id="stock" placeholder="0" min="0" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="checkbox-label"><input type="checkbox" id="soldByBox"><span>Sold by Box</span></label>
+              <small>Enable if product can be bought/sold in boxes</small>
+            </div>
+          </div>
+          <div class="form-row box-fields" id="boxFields" style="display:none">
+            <div class="form-group"><label for="boxUnits">Units per Box</label><input type="number" id="boxUnits" placeholder="e.g. 12" min="1"></div>
+            <div class="form-group"><label for="boxPurchasePrice">Box Purchase Price</label><input type="number" id="boxPurchasePrice" placeholder="0.00" step="0.01" min="0"></div>
+            <div class="form-group"><label for="boxSalePrice">Box Sale Price</label><input type="number" id="boxSalePrice" placeholder="0.00" step="0.01" min="0"></div>
+            <div class="form-group box-metrics" id="boxMetrics">
+              <label>Unit Profit (Box)</label><span class="metric-value" id="boxUnitProfit">--</span>
+              <label>Box Profit</label><span class="metric-value" id="boxTotalProfit">--</span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group" id="form-group-unit-profit">
+              <label>Unit Profit</label><span class="metric-value" id="unitProfit">--</span>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="btnSubmit">Add</button>
+            <button type="button" class="btn btn-ghost" id="btnCancel" style="display:none">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Products Table -->
+      <div class="panel panel-table">
+        <div class="table-header">
+          <h2>Products</h2>
+          <div class="table-tools">
+            <input type="text" id="searchInput" placeholder="Search products...">
+            <span class="product-count" id="productCount">0 products</span>
+          </div>
+        </div>
+        <div class="table-wrapper">
+          <table id="productsTable">
+            <thead><tr>
+              <th>ID</th><th>Barcode</th><th>Name</th><th>Category</th><th>Purch.</th><th>Sale</th>
+              <th>Profit</th><th>Stock</th><th>Box</th><th></th>
+            </tr></thead>
+            <tbody id="tableBody">
+              <tr class="empty-row"><td colspan="9">No products yet. Add one above or import an Excel file.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- TAB: RESTOCK -->
+    <section class="tab-panel hidden" id="tab-restock">
+      <div class="restock-container">
+        <div class="restock-header">
+          <h2 id="restockTitle">Low Stock Products</h2>
+          <span class="restock-threshold-badge" id="restockThresholdBadge">≤ 5 units</span>
+        </div>
+        <div class="restock-grid" id="restockGrid">
+          <div class="restock-empty" id="restockEmpty">All products are well stocked.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB: HELP -->
+    <section class="tab-panel hidden" id="tab-help">
+      <div class="help-container">
+        <div class="panel panel-info">
+          <h2 id="helpTitle">How to Create Your Own Excel File</h2>
+          <p class="info-text">If you want to manually prepare an Excel file instead of using the app to add products, create a <code>data/products.xlsx</code> file with the following column headers:</p>
+          <div class="schema-table-wrapper">
+            <table class="schema-table">
+              <thead><tr><th id="helpColHeader">Column</th><th id="helpTypeHeader">Type</th><th id="helpDescHeader">Description</th></tr></thead>
+              <tbody id="schemaBody">
+                <tr><td>id</td><td>text</td><td>Unique product identifier</td></tr>
+                <tr><td>barcode</td><td>text</td><td>Product barcode (UPC/EAN)</td></tr>
+                <tr><td>name</td><td>text</td><td>Product name</td></tr>
+                <tr><td>category</td><td>text</td><td>Category</td></tr>
+                <tr><td>purchase_price</td><td>number</td><td>Unit purchase cost</td></tr>
+                <tr><td>sale_price</td><td>number</td><td>Unit sale price</td></tr>
+                <tr><td>stock</td><td>number</td><td>Units in inventory</td></tr>
+                <tr><td>sold_by_box</td><td>true/false</td><td>Whether also sold in boxes</td></tr>
+                <tr><td>box_units</td><td>number</td><td>Units per box</td></tr>
+                <tr><td>box_purchase_price</td><td>number</td><td>Box purchase cost</td></tr>
+                <tr><td>box_sale_price</td><td>number</td><td>Box sale price</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="info-hint">The app auto-creates this file on first launch — you usually don't need to create one manually. Use <strong>Add Product</strong> in the Inventory tab instead.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <span class="footer-version">v1.0.0</span>
+      <button id="langToggleBtn" class="btn btn-lang" title="Switch language / Cambiar idioma">ES</button>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast hidden"></div>
+  <div class="modal-overlay hidden" id="modalOverlay">
+    <div class="modal">
+      <h3>Rename Store</h3>
+      <input type="text" id="modalInput" placeholder="Enter store name..." maxlength="60">
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="modalSave">Save</button>
+        <button class="btn btn-ghost" id="modalCancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay hidden" id="deleteConfirmOverlay">
+    <div class="modal">
+      <h3 id="deleteConfirmTitle">Delete Product</h3>
+      <p id="deleteConfirmDesc" class="modal-desc">Are you sure you want to delete <strong id="deleteProductName"></strong>?</p>
+      <div class="modal-actions">
+        <button class="btn btn-danger" id="deleteConfirmBtn">Delete</button>
+        <button class="btn btn-ghost" id="deleteCancelBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay hidden" id="newProjectOverlay">
+    <div class="modal modal-wide">
+      <h3 id="dbManagerTitle">Projects</h3>
+      <p id="currentProjectLabel" class="modal-desc">Current: <strong id="currentProjectName"></strong></p>
+      <div class="db-list" id="dbList"></div>
+      <div class="db-list-empty hidden" id="dbListEmpty">No projects yet. Create one below.</div>
+      <div class="db-create-row">
+        <input type="text" id="newProjectInput" placeholder="New project name..." maxlength="60">
+        <button class="btn btn-primary btn-icon" id="newProjectSave" title="Create">+</button>
+      </div>
+      <div class="db-import-row">
+        <button class="btn btn-ghost btn-import-db" id="modalImportBtn">Import Excel</button>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="newProjectCancel">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

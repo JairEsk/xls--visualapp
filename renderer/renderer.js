@@ -108,7 +108,17 @@ var i18n = {
     restockTitle: 'Low Stock Products',
     restockThreshold: '≤ 5 units',
     restockEmpty: 'All products are well stocked.',
-    restockUnitsLeft: function (n) { return n + ' left'; }
+    restockUnitsLeft: function (n) { return n + ' left'; },
+    addToCartBtn: 'Add',
+    cartTitle: 'Sale',
+    cartEmptyText: 'No items in cart',
+    cartTotalLabel: 'Total',
+    completeSale: 'Complete Sale',
+    cancelSale: 'Cancel',
+    saleCompleted: 'Sale completed.',
+    saleCancelled: 'Sale cancelled.',
+    insufficientStock: 'Insufficient stock for',
+    cartItems: function (n) { return n + ' item' + (n !== 1 ? 's' : ''); }
   },
   es: {
     title: 'Gestor de Papelería',
@@ -213,12 +223,23 @@ var i18n = {
     restockTitle: 'Productos con Bajo Stock',
     restockThreshold: '≤ 5 unidades',
     restockEmpty: 'Todos los productos tienen buen stock.',
-    restockUnitsLeft: function (n) { return n + ' restantes'; }
+    restockUnitsLeft: function (n) { return n + ' restantes'; },
+    addToCartBtn: 'Agregar',
+    cartTitle: 'Venta',
+    cartEmptyText: 'Sin productos en la venta',
+    cartTotalLabel: 'Total',
+    completeSale: 'Completar Venta',
+    cancelSale: 'Cancelar',
+    saleCompleted: 'Venta completada.',
+    saleCancelled: 'Venta cancelada.',
+    insufficientStock: 'Stock insuficiente para',
+    cartItems: function (n) { return n + ' producto' + (n !== 1 ? 's' : ''); }
   }
 };
 
 // ---- APPLICATION STATE ----
 var products = [];
+var cart = [];
 var lang = 'en';
 var currentDbName = '';
 var pendingDeleteId = null;
@@ -317,10 +338,129 @@ async function saveToDB() {
   catch (err) { console.error(err); showToast(t('dbSaveError'), 'error'); }
 }
 
-// ---- EXPLORER ----
+// ---- EXPLORER / POS ----
 var explorerSearch  = $id('explorerSearch');
 var explorerResults = $id('explorerResults');
 
+// ---- CART ----
+function addToCart(product, qty) {
+  qty = qty || 1;
+  var existing = cart.find(function (item) { return item.product.id === product.id; });
+  if (existing) {
+    if (existing.quantity + qty > existing.product.stock) {
+      showToast(t('insufficientStock') + ' ' + existing.product.name, 'error');
+      return;
+    }
+    existing.quantity += qty;
+  } else {
+    if (qty > product.stock) {
+      showToast(t('insufficientStock') + ' ' + product.name, 'error');
+      return;
+    }
+    cart.push({ product: product, quantity: qty });
+  }
+  renderCart();
+}
+
+function removeFromCart(index) {
+  cart.splice(index, 1);
+  renderCart();
+}
+
+function updateCartQuantity(index, delta) {
+  var item = cart[index];
+  var newQty = item.quantity + delta;
+  if (newQty <= 0) {
+    removeFromCart(index);
+    return;
+  }
+  if (newQty > item.product.stock) {
+    showToast(t('insufficientStock') + ' ' + item.product.name, 'error');
+    return;
+  }
+  item.quantity = newQty;
+  renderCart();
+}
+
+function calculateCartTotals() {
+  var totalItems = cart.reduce(function (sum, item) { return sum + item.quantity; }, 0);
+  var total = cart.reduce(function (sum, item) { return sum + (item.product.salePrice * item.quantity); }, 0);
+  return { totalItems: totalItems, total: total };
+}
+
+function renderCart() {
+  var cartBody = $id('cartBody');
+  var cartItemCount = $id('cartItemCount');
+  var cartTotalValue = $id('cartTotalValue');
+
+  var totals = calculateCartTotals();
+
+  if (cart.length === 0) {
+    cartBody.innerHTML = '<div class="cart-empty" id="cartEmptyMsg">' + t('cartEmptyText') + '</div>';
+    if (cartItemCount) cartItemCount.textContent = t('cartItems', 0);
+    if (cartTotalValue) cartTotalValue.textContent = '$0.00';
+    return;
+  }
+
+  var html = '<div class="cart-items">';
+  cart.forEach(function (item, i) {
+    var subtotal = item.product.salePrice * item.quantity;
+    html +=
+      '<div class="cart-item-row">' +
+        '<div class="cart-item-info">' +
+          '<span class="cart-item-name">' + escapeHtml(item.product.name) + '</span>' +
+          '<span class="cart-item-price">' + formatCurrency(item.product.salePrice) + ' /u</span>' +
+        '</div>' +
+        '<div class="cart-item-controls">' +
+          '<button class="btn btn-small btn-quantity" data-action="decrease" data-index="' + i + '">\u2212</button>' +
+          '<span class="cart-item-qty">' + item.quantity + '</span>' +
+          '<button class="btn btn-small btn-quantity" data-action="increase" data-index="' + i + '">+</button>' +
+        '</div>' +
+        '<span class="cart-item-subtotal">' + formatCurrency(subtotal) + '</span>' +
+        '<button class="btn btn-small btn-remove-item" data-index="' + i + '" title="' + (lang === 'es' ? 'Quitar' : 'Remove') + '">\u2715</button>' +
+      '</div>';
+  });
+  html += '</div>';
+  cartBody.innerHTML = html;
+
+  if (cartItemCount) cartItemCount.textContent = t('cartItems', totals.totalItems);
+  if (cartTotalValue) cartTotalValue.textContent = formatCurrency(totals.total);
+}
+
+async function completeSale() {
+  if (cart.length === 0) return;
+
+  for (var i = 0; i < cart.length; i++) {
+    var item = cart[i];
+    var freshProduct = findProduct(item.product.id);
+    if (!freshProduct || freshProduct.stock < item.quantity) {
+      showToast(t('insufficientStock') + ' ' + item.product.name, 'error');
+      return;
+    }
+  }
+
+  cart.forEach(function (item) {
+    var product = findProduct(item.product.id);
+    if (product) product.stock -= item.quantity;
+  });
+
+  await saveToDB();
+  await loadFromDB();
+
+  cart = [];
+  renderCart();
+  refreshExplorerFromSearch();
+  renderTable();
+  showToast(t('saleCompleted'), 'success');
+}
+
+function cancelSale() {
+  cart = [];
+  renderCart();
+  showToast(t('saleCancelled'), 'info');
+}
+
+// ---- EXPLORER PRODUCT CARDS ----
 function renderExplorerResults(matches) {
   if (!explorerResults) return;
   if (!matches || matches.length === 0) {
@@ -330,42 +470,31 @@ function renderExplorerResults(matches) {
 
   var html = '';
   matches.forEach(function (p) {
-    var profit     = Number(p.salePrice) - Number(p.purchasePrice);
-    var stockClass = (Number(p.stock) <= 5) ? 'stock-low'
-                   : (Number(p.stock) <= 15) ? 'stock-warn'
-                   : 'stock-ok';
+    var stockNum   = Number(p.stock);
+    var stockClass = stockNum <= 5 ? 'stock-low'
+                   : (stockNum <= 15 ? 'stock-warn'
+                   : 'stock-ok');
     var catKey  = 'categories.' + p.category;
     var catName = t(catKey);
     if (catName === catKey) catName = escapeHtml(p.category);
-
-    var boxInfo = '';
-    if (p.soldByBox && p.boxUnits > 0) {
-      var boxUnitPrice = (Number(p.boxSalePrice || 0) / Number(p.boxUnits)).toFixed(2);
-      boxInfo =
-        '<div class="exp-row"><span class="exp-label">Caja (' + p.boxUnits + 'u)</span><span class="exp-val">' + formatCurrency(p.boxSalePrice) + '</span></div>' +
-        '<div class="exp-row"><span class="exp-label">Precio caja/unidad</span><span class="exp-val">' + formatCurrency(boxUnitPrice) + '</span></div>';
-    }
+    var outOfStock = stockNum <= 0;
 
     html +=
       '<div class="explorer-card">' +
         '<div class="exp-header">' +
           '<span class="exp-name">' + escapeHtml(p.name) + '</span>' +
-          '<span class="category-tag">' + catName + '</span>' +
+          '<div class="exp-meta-row">' +
+            '<span class="id-tag">#' + p.id + '</span>' +
+            '<span class="category-tag">' + catName + '</span>' +
+            '<span class="exp-stock ' + stockClass + '">' + (lang === 'es' ? 'Stock: ' : 'Stock: ') + p.stock + '</span>' +
+          '</div>' +
         '</div>' +
         '<div class="exp-body">' +
-          '<div class="exp-price-group exp-price-editable" data-id="' + p.id + '">' +
-            '<span class="exp-price-label">' + t('salePrice') + '</span>' +
-            '<span class="exp-price" id="exp-price-' + p.id + '">' + formatCurrency(p.salePrice) + '</span>' +
-            '<span class="exp-edit-hint">&#9998;</span>' +
-          '</div>' +
-          '<div class="exp-meta">' +
-            '<div class="exp-row"><span class="exp-label">' + t('purchasePrice') + '</span><span class="exp-val">' + formatCurrency(p.purchasePrice) + '</span></div>' +
-            '<div class="exp-row"><span class="exp-label">' + t('profit') + '</span><span class="exp-val ' + (profit >= 0 ? 'profit-positive' : 'profit-negative') + '">' + formatProfit(profit) + '</span></div>' +
-            '<div class="exp-row"><span class="exp-label">' + t('stock') + '</span><span class="exp-val ' + stockClass + '">' + p.stock + '</span></div>' +
-            boxInfo +
-          '</div>' +
+          '<span class="exp-price exp-price-editable" data-id="' + p.id + '" id="exp-price-' + p.id + '">' + formatCurrency(p.salePrice) + '</span>' +
+          (outOfStock
+            ? '<button class="btn-add-cart" disabled style="background:#94a3b8;cursor:not-allowed">' + (lang === 'es' ? 'Agotado' : 'Sold out') + '</button>'
+            : '<button class="btn-add-cart" data-action="addToCart" data-id="' + p.id + '">' + t('addToCartBtn') + '</button>') +
         '</div>' +
-        '<div class="exp-footer"><span class="id-tag">#' + p.id + '</span></div>' +
       '</div>';
   });
 
@@ -392,10 +521,15 @@ function beginPriceEdit(pid, currentPrice) {
     if (isNaN(newPrice) || newPrice < 0) newPrice = currentPrice;
 
     var product = findProduct(pid);
-    if (product) product.salePrice = newPrice;
+    if (product) {
+      product.salePrice = newPrice;
+      var cartItem = cart.find(function (item) { return item.product.id === pid; });
+      if (cartItem) cartItem.product.salePrice = newPrice;
+    }
 
     saveToDB().then(function () {
       refreshExplorerFromSearch();
+      renderCart();
       renderTable();
       showToast(t('priceUpdated'), 'success');
     });
@@ -430,18 +564,70 @@ function refreshExplorerFromSearch() {
 
 if (explorerResults) {
   explorerResults.addEventListener('click', function (e) {
-    var priceGroup = e.target.closest('.exp-price-editable');
-    if (!priceGroup) return;
-    var pid = priceGroup.dataset.id;
-    var product = findProduct(pid);
-    if (!product) return;
-    beginPriceEdit(pid, Number(product.salePrice));
+    var addBtn = e.target.closest('.btn-add-cart');
+    if (addBtn && addBtn.dataset.action === 'addToCart') {
+      var product = findProduct(addBtn.dataset.id);
+      if (product) addToCart(product);
+      return;
+    }
+
+    var priceEl = e.target.closest('.exp-price-editable');
+    if (priceEl) {
+      var pid = priceEl.dataset.id;
+      var product = findProduct(pid);
+      if (product) beginPriceEdit(pid, Number(product.salePrice));
+      return;
+    }
   });
 }
 
 if (explorerSearch) {
   explorerSearch.addEventListener('input', refreshExplorerFromSearch);
+  explorerSearch.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      var q = explorerSearch.value.toLowerCase().trim();
+      if (!q) return;
+      var matches = products.filter(function (p) {
+        return String(p.barcode || '').toLowerCase().indexOf(q) !== -1 ||
+               (p.name || '').toLowerCase().indexOf(q) !== -1 ||
+               String(p.id) === q;
+      });
+      if (matches.length === 1 && matches[0].stock > 0) {
+        addToCart(matches[0]);
+        explorerSearch.value = '';
+        explorerResults.innerHTML = '<div class="explorer-empty">' + t('explorerEmpty') + '</div>';
+      } else if (matches.length > 0) {
+        refreshExplorerFromSearch();
+      }
+    }
+  });
 }
+
+var cartBody = $id('cartBody');
+if (cartBody) {
+  cartBody.addEventListener('click', function (e) {
+    var qtyBtn = e.target.closest('.btn-quantity');
+    if (qtyBtn) {
+      var idx = parseInt(qtyBtn.dataset.index);
+      var delta = qtyBtn.dataset.action === 'increase' ? 1 : -1;
+      updateCartQuantity(idx, delta);
+      return;
+    }
+
+    var removeBtn = e.target.closest('.btn-remove-item');
+    if (removeBtn) {
+      removeFromCart(parseInt(removeBtn.dataset.index));
+      return;
+    }
+  });
+}
+
+var btnCompleteSale = $id('btnCompleteSale');
+if (btnCompleteSale) btnCompleteSale.addEventListener('click', completeSale);
+
+var btnCancelSale = $id('btnCancelSale');
+if (btnCancelSale) btnCancelSale.addEventListener('click', cancelSale);
 
 // ---- INVENTORY TABLE ----
 var tableBody    = $id('tableBody');
@@ -761,7 +947,9 @@ if (deleteConfirmBtn) {
   deleteConfirmBtn.addEventListener('click', async function () {
     if (!pendingDeleteId) return;
     products = products.filter(function (x) { return x.id !== pendingDeleteId; });
+    cart = cart.filter(function (item) { return item.product.id !== pendingDeleteId; });
     await saveToDB();
+    renderCart();
     renderTable();
     closeDeleteModal();
     showToast(t('productDeleted'), 'info');
@@ -809,6 +997,8 @@ if (modalImportBtn) {
       await window.api.openExcel();
       showToast(t('importedOk'), 'info');
       await loadFromDB();
+      cart = [];
+      renderCart();
       renderTable();
       if (newProjectOverlay) newProjectOverlay.classList.add('hidden');
     } catch (err) { console.error(err); showToast(t('importFailed'), 'error'); }
@@ -825,6 +1015,8 @@ function switchLanguage(newLang) {
   translateAllUI();
   rebuildTableHead();
   renderTable();
+  renderCart();
+  if (explorerSearch && explorerSearch.value) refreshExplorerFromSearch();
 }
 
 if (langToggleBtn) {
@@ -904,6 +1096,8 @@ async function switchToDb(name) {
   updateHelpDbName();
   resetForm();
   renderTable();
+  cart = [];
+  renderCart();
 
   if (explorerResults) {
     explorerResults.innerHTML = '<div class="explorer-empty">' + t('explorerEmpty') + '</div>';
@@ -920,6 +1114,8 @@ if (newProjectSave) {
     localStorage.setItem('dbName', v);
     await window.api.newProject(v);
     products = [];
+    cart = [];
+    renderCart();
     updateDbNameLabel();
     resetForm();
     renderTable();
@@ -1117,6 +1313,16 @@ function translateAllUI() {
     placehold('explorerSearch', 'explorerSearch');
   }
 
+  posCart: {
+    setText('cartTitle', 'cartTitle');
+    setText('cartTotalLabel', 'cartTotalLabel');
+    setText('btnCompleteSale', 'completeSale');
+    setText('btnCancelSale', 'cancelSale');
+
+    var cartEmptyMsg = $id('cartEmptyMsg');
+    if (cartEmptyMsg && cart.length === 0) cartEmptyMsg.textContent = t('cartEmptyText');
+  }
+
   restockPanel: {
     var restockH2 = $sel('#tab-restock h2');
     if (restockH2) restockH2.textContent = t('restockTitle');
@@ -1141,4 +1347,5 @@ function translateAllUI() {
   translateAllUI();
   rebuildTableHead();
   loadFromDB();
+  renderCart();
 })();

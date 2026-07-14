@@ -28,15 +28,38 @@
   </header>
 
   <main>
-    <!-- TAB: EXPLORER -->
+    <!-- TAB: EXPLORER / POS -->
     <section class="tab-panel" id="tab-explorer">
-      <div class="explorer-container">
-        <div class="explorer-search-box">
-          <span class="explorer-search-icon">&#128269;</span>
-          <input type="text" id="explorerSearch" placeholder="Search or scan product..." autofocus>
+      <div class="pos-layout">
+        <div class="pos-left">
+          <div class="explorer-search-box">
+            <span class="explorer-search-icon">&#128269;</span>
+            <input type="text" id="explorerSearch" placeholder="Search or scan product..." autofocus>
+          </div>
+          <div class="explorer-results" id="explorerResults">
+            <div class="explorer-empty">Search for a product to see its price.</div>
+          </div>
         </div>
-        <div class="explorer-results" id="explorerResults">
-          <div class="explorer-empty">Search for a product to see its price.</div>
+        <div class="pos-right">
+          <div class="cart-panel">
+            <div class="cart-header">
+              <h2 id="cartTitle">Sale</h2>
+              <span class="cart-item-count" id="cartItemCount">0 items</span>
+            </div>
+            <div class="cart-body" id="cartBody">
+              <div class="cart-empty" id="cartEmptyMsg">No items in cart</div>
+            </div>
+            <div class="cart-footer" id="cartFooter">
+              <div class="cart-total-row">
+                <span class="cart-total-label" id="cartTotalLabel">Total</span>
+                <span class="cart-total-value" id="cartTotalValue">$0.00</span>
+              </div>
+              <div class="cart-actions">
+                <button class="btn btn-success btn-block" id="btnCompleteSale">Complete Sale</button>
+                <button class="btn btn-ghost btn-block" id="btnCancelSale">Cancel</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>

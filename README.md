@@ -12,7 +12,7 @@ Desktop application (Electron) for managing inventory of a stationery/office-sup
 - **Barcode autofill**: typing an existing barcode automatically fills the form (name, category, prices, stock, profit) to prevent duplicate products during inventory entry.
 - **Restock**: list of low-stock products (≤ 5 units) so you know what needs restocking.
 - **Multi-project**: create and switch between several "databases" (independent `.xlsx` files) from the app.
-- **Import / Export**: easily backup or load Excel files.
+- **Import / Export UI**: file controls are present, but complete data transfer and validation are tracked as a P0 item in the roadmap.
 - **Bilingual**: UI available in English and Spanish (ES/EN toggle).
 
 ## 🚀 Requirements
@@ -67,6 +67,10 @@ If you prefer to prepare an Excel file manually instead of using the app's form,
 | `box_units`          | number      | Units per box                        |
 | `box_purchase_price` | number      | Box purchase price                   |
 | `box_sale_price`     | number      | Box sale price                       |
+
+## 🗺️ Roadmap
+
+See [`ROADMAP.md`](ROADMAP.md) for the prioritized reliability, testing, security, packaging, and analytics work planned for future development.
 
 ## 📦 Packaging (build)
 

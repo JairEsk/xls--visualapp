@@ -27,6 +27,7 @@ function removeFromCart(index) {
   renderCart();
 }
 
+// Update quantity from cart buttons
 function updateCartQuantity(index, delta) {
   var item = cart[index];
   var newQty = item.quantity + delta;
@@ -52,15 +53,19 @@ function renderCart() {
   var cartBody = $id('cartBody');
   var cartItemCount = $id('cartItemCount');
   var cartTotalValue = $id('cartTotalValue');
+  var posLayout = $sel('.pos-layout');
 
   var totals = calculateCartTotals();
 
   if (cart.length === 0) {
+    if (posLayout) posLayout.classList.add('cart-empty-layout');
     cartBody.innerHTML = '<div class="cart-empty" id="cartEmptyMsg">' + t('cartEmptyText') + '</div>';
     if (cartItemCount) cartItemCount.textContent = t('cartItems', 0);
     if (cartTotalValue) cartTotalValue.textContent = '$0.00';
     return;
   }
+
+  if (posLayout) posLayout.classList.remove('cart-empty-layout');
 
   var html = '<div class="cart-items">';
   cart.forEach(function (item, i) {

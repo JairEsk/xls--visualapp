@@ -72,12 +72,12 @@ function renderCart() {
           '<span class="cart-item-price">' + formatCurrency(item.product.salePrice) + ' /u</span>' +
         '</div>' +
         '<div class="cart-item-controls">' +
-          '<button class="btn btn-small btn-quantity" data-action="decrease" data-index="' + i + '">\u2212</button>' +
+          '<button class="btn btn-small btn-quantity" data-action="decrease" data-index="' + i + '">&minus;</button>' +
           '<span class="cart-item-qty">' + item.quantity + '</span>' +
           '<button class="btn btn-small btn-quantity" data-action="increase" data-index="' + i + '">+</button>' +
         '</div>' +
         '<span class="cart-item-subtotal">' + formatCurrency(subtotal) + '</span>' +
-        '<button class="btn btn-small btn-remove-item" data-index="' + i + '" title="' + (lang === 'es' ? 'Quitar' : 'Remove') + '">\u2715</button>' +
+        '<button class="btn btn-small btn-remove-item" data-index="' + i + '" title="' + (lang === 'es' ? 'Quitar' : 'Remove') + '">&#x2715;</button>' +
       '</div>';
   });
   html += '</div>';
@@ -87,9 +87,54 @@ function renderCart() {
   if (cartTotalValue) cartTotalValue.textContent = formatCurrency(totals.total);
 }
 
-async function completeSale() {
-  if (cart.length === 0) return;
+var saleConfirmOverlay = $id('saleConfirmOverlay');
+var saleConfirmBtn = $id('saleConfirmBtn');
+var saleCancelBtn = $id('saleCancelBtn');
 
+function openSaleConfirmModal() {
+  if (cart.length === 0) return;
+  
+  // stock check first
+  for (var i = 0; i < cart.length; i++) {
+    var item = cart[i];
+    var freshProduct = findProduct(item.product.id);
+    if (!freshProduct || freshProduct.stock < item.quantity) {
+      showToast(t('insufficientStock') + ' ' + item.product.name, 'error');
+      return;
+    }
+  }
+
+  if (saleConfirmOverlay) {
+    saleConfirmOverlay.classList.remove('hidden');
+    setText('saleConfirmTitle', 'saleConfirmTitle');
+    setText('saleConfirmDesc', 'saleConfirmDesc');
+    setText('saleConfirmBtn', 'saleConfirmBtn');
+    setText('saleCancelBtn', 'cancel');
+  }
+}
+
+function closeSaleConfirmModal() {
+  if (saleConfirmOverlay) saleConfirmOverlay.classList.add('hidden');
+}
+
+if (saleConfirmBtn) {
+  saleConfirmBtn.addEventListener('click', async function () {
+    closeSaleConfirmModal();
+    await executeCompleteSale();
+  });
+}
+
+if (saleCancelBtn) {
+  saleCancelBtn.addEventListener('click', closeSaleConfirmModal);
+}
+
+if (saleConfirmOverlay) {
+  saleConfirmOverlay.addEventListener('click', function (e) {
+    if (e.target === saleConfirmOverlay) closeSaleConfirmModal();
+  });
+}
+
+async function executeCompleteSale() {
   for (var i = 0; i < cart.length; i++) {
     var item = cart[i];
     var freshProduct = findProduct(item.product.id);
@@ -112,6 +157,10 @@ async function completeSale() {
   refreshExplorerFromSearch();
   renderTable();
   showToast(t('saleCompleted'), 'success');
+}
+
+async function completeSale() {
+  openSaleConfirmModal();
 }
 
 function cancelSale() {

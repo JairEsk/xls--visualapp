@@ -1,27 +1,48 @@
 // ---- PROJECTS MANAGER ----
 var newProjectOverlay   = $id('newProjectOverlay');
+var projectsOverlay     = $id('projectsOverlay');
 var newProjectInput     = $id('newProjectInput');
 var newProjectSave      = $id('newProjectSave');
 var newProjectCancelBtn = $id('newProjectCancel');
+var projectsCloseBtn    = $id('projectsClose');
 var dbList              = $id('dbList');
 var dbListEmpty         = $id('dbListEmpty');
-var currentProjectName  = $id('currentProjectName');
+var dbNameLabel         = $id('dbNameLabel');
+
+function openNewProjectModal() {
+  if (!newProjectOverlay) return;
+  if (newProjectInput) newProjectInput.value = '';
+  newProjectOverlay.classList.remove('hidden');
+  if (newProjectInput) newProjectInput.focus();
+}
+
+async function openProjectsModal() {
+  if (!projectsOverlay) return;
+  projectsOverlay.classList.remove('hidden');
+  await renderDbList();
+}
+
+function closeNewProjectModal() {
+  if (newProjectOverlay) newProjectOverlay.classList.add('hidden');
+}
+
+function closeProjectsModal() {
+  if (projectsOverlay) projectsOverlay.classList.add('hidden');
+}
 
 var btnNew = $id('btnNew');
 if (btnNew) {
-  btnNew.addEventListener('click', async function () {
-    if (newProjectOverlay) {
-      newProjectInput.value = '';
-      newProjectOverlay.classList.remove('hidden');
-      await renderDbList();
-      newProjectInput.focus();
-    }
-  });
+  btnNew.addEventListener('click', openNewProjectModal);
+}
+
+if (dbNameLabel) {
+  dbNameLabel.addEventListener('click', openProjectsModal);
 }
 
 async function renderDbList() {
   if (!dbList) return;
-  if (currentProjectName) currentProjectName.textContent = currentDbName || t('none');
+  var currentNameEl = $id('currentProjectName');
+  if (currentNameEl) currentNameEl.textContent = currentDbName || t('none');
 
   try {
     var list = await window.api.listDatabases();
@@ -45,8 +66,7 @@ async function renderDbList() {
 
       if (!isCurrent) {
         row.style.cursor = 'pointer';
-        row.addEventListener('click', function (e) {
-          if (e.target.classList.contains('db-switch-btn')) return;
+        row.addEventListener('click', function () {
           switchToDb(name);
         });
       }
@@ -75,7 +95,7 @@ async function switchToDb(name) {
   if (explorerResultsEl) {
     explorerResultsEl.innerHTML = '<div class="explorer-empty">' + t('explorerEmpty') + '</div>';
   }
-  if (newProjectOverlay) newProjectOverlay.classList.add('hidden');
+  closeProjectsModal();
   showToast(t('switchTo') + name, 'success');
 }
 
@@ -92,28 +112,34 @@ if (newProjectSave) {
     resetForm();
     refreshProductViews();
     updateHelpDbName();
-    await renderDbList();
-    if (newProjectInput) newProjectInput.value = '';
-    if (newProjectInput) newProjectInput.focus();
+    closeNewProjectModal();
     showToast(t('newProjectCleared'), 'success');
   });
 }
 
 if (newProjectCancelBtn) {
-  newProjectCancelBtn.addEventListener('click', function () {
-    if (newProjectOverlay) newProjectOverlay.classList.add('hidden');
-  });
+  newProjectCancelBtn.addEventListener('click', closeNewProjectModal);
+}
+
+if (projectsCloseBtn) {
+  projectsCloseBtn.addEventListener('click', closeProjectsModal);
 }
 
 if (newProjectOverlay) {
   newProjectOverlay.addEventListener('click', function (e) {
-    if (e.target === newProjectOverlay) newProjectOverlay.classList.add('hidden');
+    if (e.target === newProjectOverlay) closeNewProjectModal();
+  });
+}
+
+if (projectsOverlay) {
+  projectsOverlay.addEventListener('click', function (e) {
+    if (e.target === projectsOverlay) closeProjectsModal();
   });
 }
 
 if (newProjectInput) {
   newProjectInput.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter'  && newProjectSave)     newProjectSave.click();
+    if (e.key === 'Enter'  && newProjectSave)      newProjectSave.click();
     if (e.key === 'Escape' && newProjectCancelBtn) newProjectCancelBtn.click();
   });
 }
@@ -124,6 +150,7 @@ function updateDbNameLabel() {
   var name = localStorage.getItem('dbName');
   label.textContent = name || '';
   label.style.display = name ? '' : 'none';
+  label.title = name ? (lang === 'es' ? 'Abrir proyectos' : 'Open projects') : '';
   if (name && !currentDbName) currentDbName = name;
 }
 

@@ -9,6 +9,7 @@ function switchLanguage(newLang) {
   rebuildTableHead();
   renderTable();
   renderCart();
+  updateDbNameLabel();
   var explorerSearchEl = $id('explorerSearch');
   if (explorerSearchEl && explorerSearchEl.value) refreshExplorerFromSearch();
 }
@@ -22,9 +23,10 @@ if (langToggleBtn) {
 // ---- TRANSLATE ALL UI ----
 function translateAllUI() {
   document.title = t('title');
+  loadTitle();
   setText('tabExplorerBtn',  'tabExplorer');
   setText('tabInventoryBtn', 'tabInventory');
-  setText('tabRestockBtn',   'tabRestock');
+  setText('tabRestockText',  'tabRestock');
   setText('tabHelpBtn',      'tabHelp');
   setText('btnNew',          'newProject');
   setText('btnExport',       'exportExcel');
@@ -95,19 +97,27 @@ function translateAllUI() {
   }
 
   projectsModal: {
-    var h3 = $sel('#newProjectOverlay h3');
-    if (h3) h3.textContent = t('dbManagerTitle');
-
-    var desc = $sel('#dbManagerTitle + p, #newProjectOverlay .modal-desc:first-of-type');
-    if (desc) desc.innerHTML = t('currentProject') + ' <strong id="currentProjectName">' + (currentDbName || '') + '</strong>';
-
+    setText('newProjectModalTitle', 'newProjectTitle');
+    setText('newProjectDescText', 'newProjectDesc');
     placehold('newProjectInput', 'newProjectPlaceholder');
     setText('newProjectCancel', 'cancel');
+
+    setText('dbManagerTitle', 'dbManagerTitle');
+    var desc = $id('currentProjectLabel');
+    if (desc) desc.innerHTML = t('currentProject') + ' <strong id="currentProjectName">' + escapeHtml(currentDbName || '') + '</strong>';
 
     var listEmpty = $id('dbListEmpty');
     if (listEmpty) listEmpty.textContent = t('dbListEmptyText');
 
     setText('modalImportBtn', 'importExcelModal');
+    setText('projectsClose', 'close');
+  }
+
+  saleConfirmModal: {
+    setText('saleConfirmTitle', 'saleConfirmTitle');
+    setText('saleConfirmDesc', 'saleConfirmDesc');
+    setText('saleConfirmBtn', 'saleConfirmBtn');
+    setText('saleCancelBtn', 'cancel');
   }
 
   inventoryPanel: {

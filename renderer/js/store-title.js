@@ -8,7 +8,13 @@ var modalCancel   = $id('modalCancel');
 
 function loadTitle() {
   var s = localStorage.getItem('storeTitle');
-  if (storeTitle) storeTitle.textContent = s || DEFAULT_TITLE;
+  if (s === 'Stationery Manager' || s === 'Gestor de Papelería' || s === 'Papelería') {
+    localStorage.removeItem('storeTitle');
+    s = null;
+  }
+  var currentTitle = s || t('title');
+  if (storeTitle) storeTitle.textContent = currentTitle;
+  document.title = currentTitle;
 }
 
 function saveTitle(title) {

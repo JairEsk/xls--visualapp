@@ -75,6 +75,21 @@ if (btnSaveStoreName) {
   });
 }
 
+function darkenHex(hex, percent) {
+  var r = parseInt(hex.substring(1, 3), 16);
+  var g = parseInt(hex.substring(3, 5), 16);
+  var b = parseInt(hex.substring(5, 7), 16);
+
+  var rd = Math.max(0, Math.floor(r * (1 - percent)));
+  var gd = Math.max(0, Math.floor(g * (1 - percent)));
+  var bd = Math.max(0, Math.floor(b * (1 - percent)));
+
+  return '#' +
+    rd.toString(16).padStart(2, '0') +
+    gd.toString(16).padStart(2, '0') +
+    bd.toString(16).padStart(2, '0');
+}
+
 // ---- THEME COLOR CUSTOMIZATION ----
 function applyThemeColor(hex) {
   if (!hex || !/^#[0-9A-F]{6}$/i.test(hex)) {
@@ -99,6 +114,11 @@ function applyThemeColor(hex) {
   root.style.setProperty('--primary-hover', hoverHex);
   root.style.setProperty('--primary-light', 'rgba(' + r + ', ' + g + ', ' + b + ', 0.10)');
   root.style.setProperty('--primary-border', 'rgba(' + r + ', ' + g + ', ' + b + ', 0.24)');
+
+  var headerBgTop = darkenHex(hex, 0.15);
+  var headerBg    = darkenHex(hex, 0.25);
+  root.style.setProperty('--header-bg-top', headerBgTop);
+  root.style.setProperty('--header-bg', headerBg);
 
   localStorage.setItem('themeColor', hex);
 

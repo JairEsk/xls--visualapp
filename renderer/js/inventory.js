@@ -61,11 +61,34 @@ function filterTable() {
   var q = searchInput ? searchInput.value.toLowerCase().trim() : '';
   if (!q) { renderTable(products); return; }
   var filtered = products.filter(function (p) {
+    var catKey = 'categories.' + p.category;
+    var catName = t(catKey);
+    if (catName === catKey) catName = p.category || '';
     return String(p.barcode || '').toLowerCase().indexOf(q) !== -1 ||
            (p.name     || '').toLowerCase().indexOf(q) !== -1 ||
-           (p.category || '').toLowerCase().indexOf(q) !== -1;
+           catName.toLowerCase().indexOf(q) !== -1;
   });
   renderTable(filtered);
+}
+
+function getCanonicalCategory(inputVal) {
+  var val = (inputVal || '').trim();
+  if (!val) return '';
+
+  for (var l in i18n) {
+    var cats = i18n[l].categories;
+    if (cats) {
+      if (cats[val]) {
+        return val;
+      }
+      for (var key in cats) {
+        if (cats[key].toLowerCase() === val.toLowerCase()) {
+          return key;
+        }
+      }
+    }
+  }
+  return val;
 }
 
 // ---- CATEGORIES ----
@@ -75,13 +98,12 @@ var categoryDatalist = $id('categoryList');
 function updateCategoryOptions() {
   if (!categoryDatalist) return;
   categoryDatalist.innerHTML = '';
-  
-  // 1. Default categories from i18n
+
+  // 1. Default categories from i18n using translated name as value
   var cats = i18n[lang].categories;
   Object.keys(cats).forEach(function (key) {
     var opt = document.createElement('option');
-    opt.value = key;
-    opt.textContent = cats[key];
+    opt.value = cats[key];
     categoryDatalist.appendChild(opt);
   });
 
@@ -89,15 +111,27 @@ function updateCategoryOptions() {
   var uniqueCats = {};
   if (Array.isArray(products)) {
     products.forEach(function (p) {
-      if (p.category && !cats[p.category]) {
-        uniqueCats[p.category] = true;
+      if (p.category) {
+        var catKey = 'categories.' + p.category;
+        var catName = t(catKey);
+        if (catName === catKey) catName = p.category;
+
+        var isDefault = false;
+        for (var k in cats) {
+          if (cats[k].toLowerCase() === catName.toLowerCase()) {
+            isDefault = true;
+            break;
+          }
+        }
+        if (!isDefault) {
+          uniqueCats[catName] = true;
+        }
       }
     });
   }
   Object.keys(uniqueCats).forEach(function (cat) {
     var opt = document.createElement('option');
     opt.value = cat;
-    opt.textContent = cat;
     categoryDatalist.appendChild(opt);
   });
 }
@@ -129,7 +163,7 @@ function getFormData() {
     id:               (idInput ? idInput.value.trim() : '') || getNextId(),
     name:             nameInput ? nameInput.value.trim() : '',
     barcode:          barcodeInput ? barcodeInput.value.trim() : '',
-    category:         categorySelect ? categorySelect.value.trim() : '',
+    category:         getCanonicalCategory(categorySelect ? categorySelect.value.trim() : ''),
     purchasePrice:    parseFloat(purchasePriceInput ? purchasePriceInput.value : 0) || 0,
     salePrice:        parseFloat(salePriceInput ? salePriceInput.value : 0) || 0,
     stock:            parseInt(stockInput ? stockInput.value : 0) || 0,
@@ -146,7 +180,12 @@ function fillForm(product) {
   if (idInput)       idInput.value       = product.id;
   if (nameInput)     nameInput.value     = product.name;
   if (barcodeInput)  barcodeInput.value  = String(product.barcode || '');
-  if (categorySelect) categorySelect.value = product.category;
+  if (categorySelect) {
+    var catKey = 'categories.' + product.category;
+    var catName = t(catKey);
+    if (catName === catKey) catName = product.category;
+    categorySelect.value = catName;
+  }
   if (purchasePriceInput) purchasePriceInput.value = product.purchasePrice;
   if (salePriceInput)     salePriceInput.value     = product.salePrice;
   if (stockInput)         stockInput.value         = product.stock;

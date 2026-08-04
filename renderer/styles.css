@@ -1229,3 +1229,10 @@ footer { padding: 0 24px 16px; max-width: 1200px; margin: 0 auto; width: 100%; }
 .admin-subpanel.hidden {
   display: none !important;
 }
+
+/* Preset theme color buttons active outline */
+.color-preset-btn.active {
+  border-color: var(--text) !important;
+  transform: scale(1.1);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
+}

@@ -94,6 +94,17 @@ function translateAllUI() {
       '<tr><td>box_sale_price</td><td>number</td><td>' + t('schemaBoxSalePrice') + '</td></tr>';
   }
 
+  configsTab: {
+    setText('tabConfigsText',  'tabConfigsText');
+    setText('configsTitle',    'configsTitle');
+    setText('lblConfigsStoreName', 'configsStoreName');
+    setText('lblConfigsThemeColor', 'configsThemeColor');
+    setText('lblConfigsThemePresets', 'configsThemePresets');
+    setText('lblConfigsThemeCustom', 'configsThemeCustom');
+    setText('btnSaveStoreName', 'save');
+    placehold('cfgStoreNameInput', 'enterStoreName');
+  }
+
   titleModal: {
     el = $sel('#modal h3'); if (el) el.textContent = t('renameStore');
     placehold('modalInput', 'enterStoreName');

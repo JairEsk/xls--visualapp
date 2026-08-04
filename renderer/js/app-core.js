@@ -15,6 +15,14 @@ var i18n = {
     tabHelp: 'Help',
     lblAdminTitle: 'Admin Panel',
     tabProjectsText: 'Database',
+    tabConfigsText: 'Settings',
+    configsTitle: 'Settings & Theme',
+    configsStoreName: 'Store Name',
+    configsThemeColor: 'Theme Accent Color',
+    configsSaveBtn: 'Save Changes',
+    configsThemeCustom: 'Custom Color',
+    configsThemePresets: 'Presets',
+    configsSaved: 'Settings saved successfully.',
     newProject: 'New Database',
     importExcel: 'Import',
     importExcelModal: 'Import Excel',
@@ -155,6 +163,14 @@ var i18n = {
     tabHelp: 'Ayuda',
     lblAdminTitle: 'Panel Admin',
     tabProjectsText: 'Base de Datos',
+    tabConfigsText: 'Ajustes',
+    configsTitle: 'Ajustes y Tema',
+    configsStoreName: 'Nombre de la Papelería',
+    configsThemeColor: 'Color de Acento del Tema',
+    configsSaveBtn: 'Guardar Cambios',
+    configsThemeCustom: 'Color Personalizado',
+    configsThemePresets: 'Preestablecidos',
+    configsSaved: 'Ajustes guardados correctamente.',
     newProject: 'Nueva Base de Datos',
     importExcel: 'Importar',
     importExcelModal: 'Importar Excel',
@@ -394,7 +410,7 @@ function switchAdminTab(subtabName) {
 }
 
 function switchTab(tabName) {
-  var subTabs = ['inventory', 'restock', 'sales', 'help', 'projects'];
+  var subTabs = ['inventory', 'restock', 'sales', 'help', 'projects', 'configs'];
   if (subTabs.indexOf(tabName) !== -1) {
     switchTab('admin');
     switchAdminTab(tabName);

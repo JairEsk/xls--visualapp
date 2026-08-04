@@ -10,8 +10,7 @@
   <div class="app-chrome">
     <header>
     <div class="header-left">
-      <h1 class="store-title" id="storeTitle" title="Click to rename">Inventory Manager</h1>
-      <span class="edit-icon" id="editTitleBtn">&#9998;</span>
+      <h1 class="store-title" id="storeTitle">Inventory Manager</h1>
     </div>
     <div class="header-center">
       <nav class="tabs-nav">
@@ -81,6 +80,9 @@
           </button>
           <button class="admin-tab" data-subtab="projects" id="tabProjectsBtn">
             <span id="tabProjectsText">Database</span>
+          </button>
+          <button class="admin-tab" data-subtab="configs" id="tabConfigsBtn">
+            <span id="tabConfigsText">Settings</span>
           </button>
           <button class="admin-tab" data-subtab="help" id="tabHelpBtn">Help</button>
         </aside>
@@ -239,6 +241,43 @@
                 <button class="btn btn-ghost" id="modalImportBtn" style="flex: 1;">Import Excel</button>
                 <button class="btn btn-ghost" id="btnExport" style="flex: 1;">Export Excel</button>
               </div>
+            </div>
+          </div>
+
+          <!-- SUBPANEL: CONFIGS -->
+          <div class="admin-subpanel hidden" id="tab-configs">
+            <div class="panel">
+              <h2 id="configsTitle">Settings & Theme</h2>
+              
+              <!-- Store Name Config -->
+              <div class="form-group" style="margin-bottom: 24px; max-width: 480px;">
+                <label for="cfgStoreNameInput" id="lblConfigsStoreName" style="font-weight:700; margin-bottom: 8px; display:block;">Store Name</label>
+                <div style="display: flex; gap: 8px;">
+                  <input type="text" id="cfgStoreNameInput" style="flex:1;" placeholder="Enter store name..." maxlength="60">
+                  <button class="btn btn-primary" id="btnSaveStoreName">Save</button>
+                </div>
+              </div>
+
+              <!-- Theme Color Config -->
+              <div class="form-group" style="margin-bottom: 16px;">
+                <label id="lblConfigsThemeColor" style="font-weight:700; margin-bottom: 12px; display:block;">Theme Accent Color</label>
+                
+                <div class="preset-theme-colors" style="display: flex; gap: 12px; margin-bottom: 16px; align-items: center; flex-wrap: wrap;">
+                  <span id="lblConfigsThemePresets" style="font-size:12px; font-weight:600; color:var(--text-secondary);">Presets:</span>
+                  <button class="color-preset-btn" data-color="#2f6f62" style="background:#2f6f62; border: 2px solid transparent; width: 32px; height: 32px; border-radius: 50%; cursor: pointer;" title="Sage Green"></button>
+                  <button class="color-preset-btn" data-color="#2f5c6f" style="background:#2f5c6f; border: 2px solid transparent; width: 32px; height: 32px; border-radius: 50%; cursor: pointer;" title="Ocean Blue"></button>
+                  <button class="color-preset-btn" data-color="#b06243" style="background:#b06243; border: 2px solid transparent; width: 32px; height: 32px; border-radius: 50%; cursor: pointer;" title="Terracotta"></button>
+                  <button class="color-preset-btn" data-color="#ab3f3f" style="background:#ab3f3f; border: 2px solid transparent; width: 32px; height: 32px; border-radius: 50%; cursor: pointer;" title="Crimson Red"></button>
+                  <button class="color-preset-btn" data-color="#703d6d" style="background:#703d6d; border: 2px solid transparent; width: 32px; height: 32px; border-radius: 50%; cursor: pointer;" title="Plum Purple"></button>
+                  <button class="color-preset-btn" data-color="#334155" style="background:#334155; border: 2px solid transparent; width: 32px; height: 32px; border-radius: 50%; cursor: pointer;" title="Slate Charcoal"></button>
+                </div>
+
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <span id="lblConfigsThemeCustom" style="font-size:12px; font-weight:600; color:var(--text-secondary);">Custom Color:</span>
+                  <input type="color" id="cfgThemeColorPicker" style="width: 44px; height: 28px; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; padding:0; background:none;">
+                </div>
+              </div>
+
             </div>
           </div>
 

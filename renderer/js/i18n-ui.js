@@ -25,11 +25,14 @@ function translateAllUI() {
   document.title = t('title');
   loadTitle();
   setText('tabExplorerBtn',  'tabExplorer');
+  setText('tabAdminText',    'tabAdmin');
+  setText('lblAdminTitle',   'lblAdminTitle');
+  setText('tabProjectsText', 'tabProjectsText');
   setText('tabInventoryBtn', 'tabInventory');
   setText('tabRestockText',  'tabRestock');
   setText('tabSalesText',    'tabSales');
   setText('tabHelpBtn',      'tabHelp');
-  setText('btnProjects',     'dbManagerTitle');
+  // btnProjects is now inline tabProjectsBtn
   setText('btnCreateNewDb',  'newProject');
   setText('btnExport',       'exportExcel');
 

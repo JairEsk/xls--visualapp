@@ -16,16 +16,14 @@
     <div class="header-center">
       <nav class="tabs-nav">
         <button class="tab active" data-tab="explorer" id="tabExplorerBtn">Explorer</button>
-        <button class="tab" data-tab="inventory" id="tabInventoryBtn">Inventory</button>
-        <button class="tab" data-tab="restock" id="tabRestockBtn"><span id="tabRestockText">Restock</span><span class="tab-badge hidden" id="restockTabBadge"></span></button>
-        <button class="tab" data-tab="sales" id="tabSalesBtn"><span id="tabSalesText">Ledger</span></button>
-        <button class="tab" data-tab="help" id="tabHelpBtn">Help</button>
+        <button class="tab" data-tab="admin" id="tabAdminBtn">
+          <span id="tabAdminText">Admin</span>
+          <span class="tab-badge hidden" id="adminHeaderBadge"></span>
+        </button>
       </nav>
     </div>
     <div class="header-actions">
-      <span id="dbNameLabel" class="db-name-label"></span>
-      <button id="btnProjects" class="btn btn-ghost-light">Projects</button>
-      <button id="btnExport" class="btn btn-ghost-light">Export</button>
+      <span id="dbNameLabel" class="db-name-label" title="Switch Database"></span>
     </div>
     </header>
   </div>
@@ -68,173 +66,210 @@
       </div>
     </section>
 
-    <!-- TAB: INVENTORY -->
-    <section class="tab-panel hidden" id="tab-inventory">
-      <!-- Add/Edit Form -->
-      <div class="panel panel-form">
-        <h2 id="formTitle">Add Product</h2>
-        <form id="productForm">
-          <input type="hidden" id="editingId">
-          <div class="form-row">
-            <input type="hidden" id="id">
-            <div class="form-group">
-              <label for="barcode">Barcode</label>
-              <input type="text" id="barcode" placeholder="e.g. 7501234567890">
-            </div>
-            <div class="form-group flex-2">
-              <label for="name">Name</label>
-              <input type="text" id="name" placeholder="e.g. HB #2 Pencil" required>
-            </div>
-            <div class="form-group">
-              <label for="category">Category</label>
-              <input type="text" id="category" list="categoryList" placeholder="e.g. Notebooks" required>
-              <datalist id="categoryList"></datalist>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="purchasePrice">Purchase Price</label>
-              <input type="number" id="purchasePrice" placeholder="0.00" step="0.01" min="0" required>
-            </div>
-            <div class="form-group">
-              <label for="salePrice">Sale Price</label>
-              <input type="number" id="salePrice" placeholder="0.00" step="0.01" min="0" required>
-            </div>
-            <div class="form-group">
-              <label for="stock">Stock</label>
-              <input type="number" id="stock" placeholder="0" min="0" required>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="checkbox-label"><input type="checkbox" id="soldByBox"><span>Sold by Box</span></label>
-              <small>Enable if product can be bought/sold in boxes</small>
-            </div>
-          </div>
-          <div class="form-row box-fields" id="boxFields" style="display:none">
-            <div class="form-group"><label for="boxUnits">Units per Box</label><input type="number" id="boxUnits" placeholder="e.g. 12" min="1"></div>
-            <div class="form-group"><label for="boxPurchasePrice">Box Purchase Price</label><input type="number" id="boxPurchasePrice" placeholder="0.00" step="0.01" min="0"></div>
-            <div class="form-group"><label for="boxSalePrice">Box Sale Price</label><input type="number" id="boxSalePrice" placeholder="0.00" step="0.01" min="0"></div>
-            <div class="form-group box-metrics" id="boxMetrics">
-              <label>Unit Profit (Box)</label><span class="metric-value" id="boxUnitProfit">--</span>
-              <label>Box Profit</label><span class="metric-value" id="boxTotalProfit">--</span>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group" id="form-group-unit-profit">
-              <label>Unit Profit</label><span class="metric-value" id="unitProfit">--</span>
-            </div>
-          </div>
-          <div class="form-actions">
-            <button type="submit" class="btn btn-primary" id="btnSubmit">Add</button>
-            <button type="button" class="btn btn-ghost" id="btnCancel" style="display:none">Cancel</button>
-          </div>
-        </form>
-      </div>
+    <!-- TAB: ADMIN (grouped views) -->
+    <section class="tab-panel hidden" id="tab-admin">
+      <div class="admin-layout">
+        <aside class="admin-sidebar">
+          <div class="admin-sidebar-title" id="lblAdminTitle">Admin Panel</div>
+          <button class="admin-tab active" data-subtab="inventory" id="tabInventoryBtn">Inventory</button>
+          <button class="admin-tab" data-subtab="restock" id="tabRestockBtn">
+            <span id="tabRestockText">Restock</span>
+            <span class="tab-badge hidden" id="restockTabBadge"></span>
+          </button>
+          <button class="admin-tab" data-subtab="sales" id="tabSalesBtn">
+            <span id="tabSalesText">Ledger</span>
+          </button>
+          <button class="admin-tab" data-subtab="projects" id="tabProjectsBtn">
+            <span id="tabProjectsText">Database</span>
+          </button>
+          <button class="admin-tab" data-subtab="help" id="tabHelpBtn">Help</button>
+        </aside>
 
-      <!-- Products Table -->
-      <div class="panel panel-table">
-        <div class="table-header">
-          <h2>Products</h2>
-          <div class="table-tools">
-            <input type="text" id="searchInput" placeholder="Search products...">
-            <span class="product-count" id="productCount">0 products</span>
-          </div>
-        </div>
-        <div class="table-wrapper">
-          <table id="productsTable">
-            <thead><tr>
-              <th>Barcode</th><th>Name</th><th>Category</th><th>Purch.</th><th>Sale</th>
-              <th>Profit</th><th>Stock</th><th>Box</th><th>Actions</th>
-            </tr></thead>
-            <tbody id="tableBody">
-              <tr class="empty-row"><td colspan="9">No products yet. Add one above or import an Excel file.</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+        <div class="admin-content">
+          <!-- SUBPANEL: INVENTORY -->
+          <div class="admin-subpanel" id="tab-inventory">
+            <!-- Add/Edit Form -->
+            <div class="panel panel-form">
+              <h2 id="formTitle">Add Product</h2>
+              <form id="productForm">
+                <input type="hidden" id="editingId">
+                <div class="form-row">
+                  <input type="hidden" id="id">
+                  <div class="form-group">
+                    <label for="barcode">Barcode</label>
+                    <input type="text" id="barcode" placeholder="e.g. 7501234567890">
+                  </div>
+                  <div class="form-group flex-2">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" placeholder="e.g. HB #2 Pencil" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="category">Category</label>
+                    <input type="text" id="category" list="categoryList" placeholder="e.g. Notebooks" required>
+                    <datalist id="categoryList"></datalist>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="purchasePrice">Purchase Price</label>
+                    <input type="number" id="purchasePrice" placeholder="0.00" step="0.01" min="0" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="salePrice">Sale Price</label>
+                    <input type="number" id="salePrice" placeholder="0.00" step="0.01" min="0" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="stock">Stock</label>
+                    <input type="number" id="stock" placeholder="0" min="0" required>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="checkbox-label"><input type="checkbox" id="soldByBox"><span>Sold by Box</span></label>
+                    <small>Enable if product can be bought/sold in boxes</small>
+                  </div>
+                </div>
+                <div class="form-row box-fields" id="boxFields" style="display:none">
+                  <div class="form-group"><label for="boxUnits">Units per Box</label><input type=\"number\" id="boxUnits" placeholder="e.g. 12" min="1"></div>
+                  <div class="form-group"><label for="boxPurchasePrice">Box Purchase Price</label><input type="number" id="boxPurchasePrice" placeholder="0.00" step="0.01" min="0"></div>
+                  <div class="form-group"><label for="boxSalePrice">Box Sale Price</label><input type="number" id="boxSalePrice" placeholder="0.00" step="0.01" min="0"></div>
+                  <div class="form-group box-metrics" id="boxMetrics">
+                    <label>Unit Profit (Box)</label><span class="metric-value" id="boxUnitProfit">--</span>
+                    <label>Box Profit</label><span class="metric-value" id="boxTotalProfit">--</span>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group" id="form-group-unit-profit">
+                    <label>Unit Profit</label><span class="metric-value" id="unitProfit">--</span>
+                  </div>
+                </div>
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary" id="btnSubmit">Add</button>
+                  <button type="button" class="btn btn-ghost" id="btnCancel" style="display:none">Cancel</button>
+                </div>
+              </form>
+            </div>
 
-    </section>
+            <!-- Products Table -->
+            <div class="panel panel-table">
+              <div class="table-header">
+                <h2>Products</h2>
+                <div class="table-tools">
+                  <input type="text" id="searchInput" placeholder="Search products...">
+                  <span class="product-count" id="productCount">0 products</span>
+                </div>
+              </div>
+              <div class="table-wrapper">
+                <table id="productsTable">
+                  <thead><tr>
+                    <th>Barcode</th><th>Name</th><th>Category</th><th>Purch.</th><th>Sale</th>
+                    <th>Profit</th><th>Stock</th><th>Box</th><th>Actions</th>
+                  </tr></thead>
+                  <tbody id="tableBody">
+                    <tr class="empty-row"><td colspan="9">No products yet. Add one above or import an Excel file.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
 
-    <!-- TAB: RESTOCK -->
-    <section class="tab-panel hidden" id="tab-restock">
-      <div class="restock-container">
-        <div class="restock-header">
-          <h2 id="restockTitle">Low Stock Products</h2>
-          <span class="restock-threshold-badge" id="restockThresholdBadge">≤ 5 units</span>
-        </div>
-        <div class="restock-grid" id="restockGrid">
-          <div class="restock-empty" id="restockEmpty">All products are well stocked.</div>
-        </div>
-      </div>
-    </section>
+          <!-- SUBPANEL: RESTOCK -->
+          <div class="admin-subpanel hidden" id="tab-restock">
+            <div class="restock-container">
+              <div class="restock-header">
+                <h2 id="restockTitle">Low Stock Products</h2>
+                <span class="restock-threshold-badge" id="restockThresholdBadge">≤ 5 units</span>
+              </div>
+              <div class="restock-grid" id="restockGrid">
+                <div class="restock-empty" id="restockEmpty">All products are well stocked.</div>
+              </div>
+            </div>
+          </div>
 
-    <!-- TAB: SALES HISTORY -->
-    <section class="tab-panel hidden" id="tab-sales">
-      <div class="table-header">
-        <h2 id="lblSalesTitle">Sales Ledger</h2>
-        <div class="table-tools" style="gap: 8px;">
-          <div class="sales-stat-card">
-            <span id="lblSalesCount" class="sales-stat-label">Sales</span>
-            <strong id="salesCountVal" class="sales-stat-val">0</strong>
+          <!-- SUBPANEL: SALES HISTORY -->
+          <div class="admin-subpanel hidden" id="tab-sales">
+            <div class="table-header">
+              <h2 id="lblSalesTitle">Sales Ledger</h2>
+              <div class="table-tools" style="gap: 8px;">
+                <div class="sales-stat-card">
+                  <span id="lblSalesCount" class="sales-stat-label">Sales</span>
+                  <strong id="salesCountVal" class="sales-stat-val">0</strong>
+                </div>
+                <div class="sales-stat-card">
+                  <span id="lblSalesRevenue" class="sales-stat-label">Revenue</span>
+                  <strong id="salesRevenueVal" class="sales-stat-val">$0.00</strong>
+                </div>
+                <div class="sales-stat-card">
+                  <span id="lblSalesAvg" class="sales-stat-label">Avg Ticket</span>
+                  <strong id="salesAvgVal" class="sales-stat-val">$0.00</strong>
+                </div>
+              </div>
+            </div>
+            <div class="panel" style="padding: 0; overflow: hidden; border-radius: var(--radius-sm);">
+              <div class="table-wrapper">
+                <table id="salesTable">
+                  <thead>
+                    <tr>
+                      <th id="thSalesDate">Date</th>
+                      <th id="thSalesItems">Qty</th>
+                      <th id="thSalesDetails">Details</th>
+                      <th id="thSalesReceived">Received</th>
+                      <th id="thSalesChange">Change</th>
+                      <th id="thSalesMethod">Payment</th>
+                      <th id="thSalesTotal">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody id="salesTableBody">
+                    <tr class="empty-row"><td colspan="7" id="salesEmptyText">No sales registered yet.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
-          <div class="sales-stat-card">
-            <span id="lblSalesRevenue" class="sales-stat-label">Revenue</span>
-            <strong id="salesRevenueVal" class="sales-stat-val">$0.00</strong>
-          </div>
-          <div class="sales-stat-card">
-            <span id="lblSalesAvg" class="sales-stat-label">Avg Ticket</span>
-            <strong id="salesAvgVal" class="sales-stat-val">$0.00</strong>
-          </div>
-        </div>
-      </div>
-      <div class="panel" style="padding: 0; overflow: hidden; border-radius: var(--radius-sm);">
-        <div class="table-wrapper">
-          <table id="salesTable">
-            <thead>
-              <tr>
-                <th id="thSalesDate">Date</th>
-                <th id="thSalesItems">Qty</th>
-                <th id="thSalesDetails">Details</th>
-                <th id="thSalesReceived">Received</th>
-                <th id="thSalesChange">Change</th>
-                <th id="thSalesMethod">Payment</th>
-                <th id="thSalesTotal">Total</th>
-              </tr>
-            </thead>
-            <tbody id="salesTableBody">
-              <tr class="empty-row"><td colspan="7" id="salesEmptyText">No sales registered yet.</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
 
-    <!-- TAB: HELP -->
-    <section class="tab-panel hidden" id="tab-help">
-      <div class="help-container">
-        <div class="panel panel-info">
-          <h2 id="helpTitle">How to Create Your Own Excel File</h2>
-          <p class="info-text">If you want to manually prepare an Excel file instead of using the app to add products, create a <code>data/products.xlsx</code> file with the following column headers:</p>
-          <div class="schema-table-wrapper">
-            <table class="schema-table">
-              <thead><tr><th id="helpColHeader">Column</th><th id="helpTypeHeader">Type</th><th id="helpDescHeader">Description</th></tr></thead>
-              <tbody id="schemaBody">
-                <tr><td>id</td><td>text</td><td>Unique product identifier</td></tr>
-                <tr><td>barcode</td><td>text</td><td>Product barcode (UPC/EAN)</td></tr>
-                <tr><td>name</td><td>text</td><td>Product name</td></tr>
-                <tr><td>category</td><td>text</td><td>Category</td></tr>
-                <tr><td>purchase_price</td><td>number</td><td>Unit purchase cost</td></tr>
-                <tr><td>sale_price</td><td>number</td><td>Unit sale price</td></tr>
-                <tr><td>stock</td><td>number</td><td>Units in inventory</td></tr>
-                <tr><td>sold_by_box</td><td>true/false</td><td>Whether also sold in boxes</td></tr>
-                <tr><td>box_units</td><td>number</td><td>Units per box</td></tr>
-                <tr><td>box_purchase_price</td><td>number</td><td>Box purchase cost</td></tr>
-                <tr><td>box_sale_price</td><td>number</td><td>Box sale price</td></tr>
-              </tbody>
-            </table>
+          <!-- SUBPANEL: DATABASE SWITCHER / TOOLS -->
+          <div class="admin-subpanel hidden" id="tab-projects">
+            <div class="panel">
+              <h2 id="dbManagerTitle">Projects</h2>
+              <p id="currentProjectLabel" class="modal-desc" style="margin-bottom: 16px;">Current: <strong id="currentProjectName"></strong></p>
+              <div class="db-list" id="dbList" style="max-height: none; margin-bottom: 16px;"></div>
+              <div class="db-list-empty hidden" id="dbListEmpty">No projects yet.</div>
+              <div class="db-import-row" style="display: flex; gap: 8px; margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px;">
+                <button class="btn btn-primary" id="btnCreateNewDb" style="flex: 1;">+ New Database</button>
+                <button class="btn btn-ghost" id="modalImportBtn" style="flex: 1;">Import Excel</button>
+                <button class="btn btn-ghost" id="btnExport" style="flex: 1;">Export Excel</button>
+              </div>
+            </div>
           </div>
-          <p class="info-hint">The app auto-creates this file on first launch — you usually don't need to create one manually. Use <strong>Add Product</strong> in the Inventory tab instead.</p>
+
+          <!-- SUBPANEL: HELP -->
+          <div class="admin-subpanel hidden" id="tab-help">
+            <div class="help-container">
+              <div class="panel panel-info">
+                <h2 id="helpTitle">How to Create Your Own Excel File</h2>
+                <p class="info-text">If you want to manually prepare an Excel file instead of using the app to add products, create a <code>data/products.xlsx</code> file with the following column headers:</p>
+                <div class="schema-table-wrapper">
+                  <table class="schema-table">
+                    <thead><tr><th id="helpColHeader">Column</th><th id="helpTypeHeader">Type</th><th id="helpDescHeader">Description</th></tr></thead>
+                    <tbody id="schemaBody">
+                      <tr><td>id</td><td>text</td><td>Unique product identifier</td></tr>
+                      <tr><td>barcode</td><td>text</td><td>Product barcode (UPC/EAN)</td></tr>
+                      <tr><td>name</td><td>text</td><td>Product name</td></tr>
+                      <tr><td>category</td><td>text</td><td>Category</td></tr>
+                      <tr><td>purchase_price</td><td>number</td><td>Unit purchase cost</td></tr>
+                      <tr><td>sale_price</td><td>number</td><td>Unit sale price</td></tr>
+                      <tr><td>stock</td><td>number</td><td>Units in inventory</td></tr>
+                      <tr><td>sold_by_box</td><td>true/false</td><td>Whether also sold in boxes</td></tr>
+                      <tr><td>box_units</td><td>number</td><td>Units per box</td></tr>
+                      <tr><td>box_purchase_price</td><td>number</td><td>Box purchase cost</td></tr>
+                      <tr><td>box_sale_price</td><td>number</td><td>Box sale price</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <p class="info-hint">The app auto-creates this file on first launch — you usually don't need to create one manually. Use <strong>Add Product</strong> in the Inventory tab instead.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -312,22 +347,6 @@
       </div>
       <div class="modal-actions">
         <button class="btn btn-ghost" id="newProjectCancel">Cancel</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-overlay hidden" id="projectsOverlay">
-    <div class="modal modal-wide">
-      <h3 id="dbManagerTitle">Projects</h3>
-      <p id="currentProjectLabel" class="modal-desc">Current: <strong id="currentProjectName"></strong></p>
-      <div class="db-list" id="dbList"></div>
-      <div class="db-list-empty hidden" id="dbListEmpty">No projects yet.</div>
-      <div class="db-import-row" style="display: flex; gap: 8px; margin-top: 8px;">
-        <button class="btn btn-primary" id="btnCreateNewDb" style="flex: 1;">+ New Database</button>
-        <button class="btn btn-ghost" id="modalImportBtn" style="flex: 1;">Import Excel</button>
-      </div>
-      <div class="modal-actions">
-        <button class="btn btn-ghost" id="projectsClose">Close</button>
       </div>
     </div>
   </div>

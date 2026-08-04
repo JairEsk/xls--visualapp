@@ -17,8 +17,7 @@ function openNewProjectModal() {
 }
 
 async function openProjectsModal() {
-  if (!projectsOverlay) return;
-  projectsOverlay.classList.remove('hidden');
+  switchTab('projects');
   await renderDbList();
 }
 
@@ -26,9 +25,7 @@ function closeNewProjectModal() {
   if (newProjectOverlay) newProjectOverlay.classList.add('hidden');
 }
 
-function closeProjectsModal() {
-  if (projectsOverlay) projectsOverlay.classList.add('hidden');
-}
+function closeProjectsModal() {}
 
 var btnProjects = $id('btnProjects');
 if (btnProjects) {
@@ -40,6 +37,13 @@ if (btnCreateNewDb) {
   btnCreateNewDb.addEventListener('click', function () {
     closeProjectsModal();
     openNewProjectModal();
+  });
+}
+
+var tabProjectsBtn = $id('tabProjectsBtn');
+if (tabProjectsBtn) {
+  tabProjectsBtn.addEventListener('click', function () {
+    renderDbList();
   });
 }
 

@@ -9,9 +9,12 @@ var i18n = {
     title: 'Inventory Manager',
     windowContext: 'Inventory workspace',
     tabExplorer: 'Explorer',
+    tabAdmin: 'Admin',
     tabInventory: 'Inventory',
     tabRestock: 'Restock',
     tabHelp: 'Help',
+    lblAdminTitle: 'Admin Panel',
+    tabProjectsText: 'Database',
     newProject: 'New Database',
     importExcel: 'Import',
     importExcelModal: 'Import Excel',
@@ -146,9 +149,12 @@ var i18n = {
     title: 'Gestor de Inventario',
     windowContext: 'Espacio de inventario',
     tabExplorer: 'Explorador',
+    tabAdmin: 'Admin',
     tabInventory: 'Inventario',
     tabRestock: 'Reestock',
     tabHelp: 'Ayuda',
+    lblAdminTitle: 'Panel Admin',
+    tabProjectsText: 'Base de Datos',
     newProject: 'Nueva Base de Datos',
     importExcel: 'Importar',
     importExcelModal: 'Importar Excel',
@@ -375,8 +381,25 @@ function findProductIndex(id) {
 // ---- TABS ----
 var tabs          = $selAll('.tab');
 var tabPanels     = $selAll('.tab-panel');
+var adminTabs     = $selAll('.admin-tab');
+var adminSubpanels = $selAll('.admin-subpanel');
+
+function switchAdminTab(subtabName) {
+  adminTabs.forEach(function (t) { t.classList.remove('active'); });
+  adminSubpanels.forEach(function (p) { p.classList.add('hidden'); });
+  var tabEl = $sel('.admin-tab[data-subtab="' + subtabName + '"]');
+  var panelEl = $id('tab-' + subtabName);
+  if (tabEl) tabEl.classList.add('active');
+  if (panelEl) panelEl.classList.remove('hidden');
+}
 
 function switchTab(tabName) {
+  var subTabs = ['inventory', 'restock', 'sales', 'help', 'projects'];
+  if (subTabs.indexOf(tabName) !== -1) {
+    switchTab('admin');
+    switchAdminTab(tabName);
+    return;
+  }
   tabs.forEach(function (t) { t.classList.remove('active'); });
   tabPanels.forEach(function (p) { p.classList.add('hidden'); });
   var tabEl   = $sel('.tab[data-tab="' + tabName + '"]');
@@ -387,6 +410,10 @@ function switchTab(tabName) {
 
 tabs.forEach(function (tab) {
   tab.addEventListener('click', function () { switchTab(tab.dataset.tab); });
+});
+
+adminTabs.forEach(function (tab) {
+  tab.addEventListener('click', function () { switchAdminTab(tab.dataset.subtab); });
 });
 
 // ---- PERSISTENCE ----

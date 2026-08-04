@@ -233,6 +233,26 @@
     <div class="modal">
       <h3 id="saleConfirmTitle">Complete Sale</h3>
       <p id="saleConfirmDesc" class="modal-desc">Are you sure you want to complete this sale?</p>
+      
+      <div class="sale-confirm-calc">
+        <div class="sale-confirm-total-row">
+          <span id="lblConfirmTotal">Total:</span>
+          <strong id="saleConfirmTotalVal" class="sale-confirm-total-val">$0.00</strong>
+        </div>
+        
+        <div class="sale-confirm-input-group">
+          <label id="lblCashReceived" for="cashReceived" style="font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.4px;">Cash Received</label>
+          <input type="number" id="cashReceived" step="0.01" min="0" placeholder="0.00">
+        </div>
+        
+        <div class="quick-cash-row" id="quickCashBtns"></div>
+        
+        <div class="sale-confirm-change-row" id="saleConfirmChangeRow">
+          <span id="lblChangeDue" class="sale-confirm-change-label">Change Due</span>
+          <strong id="changeDueVal" class="sale-confirm-change-val">$0.00</strong>
+        </div>
+      </div>
+      
       <div class="modal-actions">
         <button class="btn btn-success" id="saleConfirmBtn">Complete Sale</button>
         <button class="btn btn-ghost" id="saleCancelBtn">Cancel</button>

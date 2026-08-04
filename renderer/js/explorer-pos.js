@@ -91,10 +91,73 @@ var saleConfirmOverlay = $id('saleConfirmOverlay');
 var saleConfirmBtn = $id('saleConfirmBtn');
 var saleCancelBtn = $id('saleCancelBtn');
 
+function getQuickCashSuggestions(total) {
+  var denoms = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000];
+  var filtered = denoms.filter(function(d) { return d >= total; });
+  var suggestions = filtered.slice(0, 3);
+  if (suggestions.indexOf(total) === -1) {
+    suggestions.unshift(total);
+  }
+  return suggestions.filter(function(v, i, self) { return self.indexOf(v) === i; }).slice(0, 4);
+}
+
+function updateChangeCalculation(total) {
+  var cashInput = $id('cashReceived');
+  var changeDueVal = $id('changeDueVal');
+  var lblChangeDue = $id('lblChangeDue');
+  var saleConfirmBtn = $id('saleConfirmBtn');
+  var saleConfirmChangeRow = $id('saleConfirmChangeRow');
+  
+  if (!cashInput || !changeDueVal || !saleConfirmBtn) return;
+  
+  var cashVal = parseFloat(cashInput.value);
+  if (isNaN(cashVal) || cashInput.value.trim() === '') {
+    changeDueVal.textContent = formatCurrency(0);
+    if (lblChangeDue) lblChangeDue.textContent = t('lblChangeDue');
+    if (saleConfirmChangeRow) saleConfirmChangeRow.classList.remove('insufficient-cash');
+    saleConfirmBtn.disabled = false;
+    return;
+  }
+  
+  var change = cashVal - total;
+  if (change < 0) {
+    changeDueVal.textContent = formatCurrency(Math.abs(change));
+    if (lblChangeDue) lblChangeDue.textContent = t('insufficientCash');
+    if (saleConfirmChangeRow) saleConfirmChangeRow.classList.add('insufficient-cash');
+    saleConfirmBtn.disabled = true;
+  } else {
+    changeDueVal.textContent = formatCurrency(change);
+    if (lblChangeDue) lblChangeDue.textContent = t('lblChangeDue');
+    if (saleConfirmChangeRow) saleConfirmChangeRow.classList.remove('insufficient-cash');
+    saleConfirmBtn.disabled = false;
+  }
+}
+
+function generateQuickCashButtons(total) {
+  var container = $id('quickCashBtns');
+  if (!container) return;
+  container.innerHTML = '';
+  
+  var suggestions = getQuickCashSuggestions(total);
+  suggestions.forEach(function(val) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn-quick-cash';
+    btn.textContent = formatCurrency(val);
+    btn.addEventListener('click', function() {
+      var cashInput = $id('cashReceived');
+      if (cashInput) {
+        cashInput.value = val.toFixed(2);
+        updateChangeCalculation(total);
+      }
+    });
+    container.appendChild(btn);
+  });
+}
+
 function openSaleConfirmModal() {
   if (cart.length === 0) return;
   
-  // stock check first
   for (var i = 0; i < cart.length; i++) {
     var item = cart[i];
     var freshProduct = findProduct(item.product.id);
@@ -104,12 +167,36 @@ function openSaleConfirmModal() {
     }
   }
 
+  var totals = calculateCartTotals();
+  var totalVal = totals.total;
+
+  var saleConfirmTotalVal = $id('saleConfirmTotalVal');
+  if (saleConfirmTotalVal) saleConfirmTotalVal.textContent = formatCurrency(totalVal);
+
+  var cashInput = $id('cashReceived');
+  if (cashInput) {
+    cashInput.value = '';
+  }
+
   if (saleConfirmOverlay) {
     saleConfirmOverlay.classList.remove('hidden');
     setText('saleConfirmTitle', 'saleConfirmTitle');
     setText('saleConfirmDesc', 'saleConfirmDesc');
+    setText('lblConfirmTotal', 'lblConfirmTotal');
+    setText('lblCashReceived', 'lblCashReceived');
+    setText('lblChangeDue', 'lblChangeDue');
     setText('saleConfirmBtn', 'saleConfirmBtn');
     setText('saleCancelBtn', 'cancel');
+  }
+
+  updateChangeCalculation(totalVal);
+  generateQuickCashButtons(totalVal);
+
+  if (cashInput) {
+    setTimeout(function() {
+      cashInput.focus();
+      cashInput.select();
+    }, 100);
   }
 }
 
@@ -131,6 +218,24 @@ if (saleCancelBtn) {
 if (saleConfirmOverlay) {
   saleConfirmOverlay.addEventListener('click', function (e) {
     if (e.target === saleConfirmOverlay) closeSaleConfirmModal();
+  });
+}
+
+var cashReceivedInput = $id('cashReceived');
+if (cashReceivedInput) {
+  cashReceivedInput.addEventListener('input', function() {
+    var totals = calculateCartTotals();
+    updateChangeCalculation(totals.total);
+  });
+  
+  cashReceivedInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      var btn = $id('saleConfirmBtn');
+      if (btn && !btn.disabled) {
+        btn.click();
+      }
+    }
   });
 }
 

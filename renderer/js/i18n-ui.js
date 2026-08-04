@@ -116,6 +116,9 @@ function translateAllUI() {
   saleConfirmModal: {
     setText('saleConfirmTitle', 'saleConfirmTitle');
     setText('saleConfirmDesc', 'saleConfirmDesc');
+    setText('lblConfirmTotal', 'lblConfirmTotal');
+    setText('lblCashReceived', 'lblCashReceived');
+    setText('lblChangeDue', 'lblChangeDue');
     setText('saleConfirmBtn', 'saleConfirmBtn');
     setText('saleCancelBtn', 'cancel');
   }

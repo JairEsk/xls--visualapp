@@ -889,6 +889,100 @@ tbody tr:hover { background: rgba(65, 54, 42, 0.04); }
 .modal input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
 .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
 
+/* ---- PAYMENT CALCULATOR ---- */
+.sale-confirm-calc {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 4px;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+.sale-confirm-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.sale-confirm-total-val {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--primary);
+}
+.sale-confirm-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.quick-cash-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+.btn-quick-cash {
+  flex: 1;
+  min-width: 60px;
+  padding: 8px 6px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.12s;
+  color: var(--text);
+  font-family: inherit;
+  text-align: center;
+}
+.btn-quick-cash:hover {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  color: var(--primary);
+}
+.sale-confirm-change-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--success-light);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(63, 143, 104, 0.24);
+  margin-top: 4px;
+  transition: all 0.15s;
+}
+.sale-confirm-change-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.sale-confirm-change-val {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--success);
+}
+.sale-confirm-change-row.insufficient-cash {
+  background: var(--danger-light);
+  border-color: rgba(201, 79, 79, 0.24);
+}
+.sale-confirm-change-row.insufficient-cash .sale-confirm-change-label {
+  color: var(--danger);
+}
+.sale-confirm-change-row.insufficient-cash .sale-confirm-change-val {
+  color: var(--danger);
+}
+
+.modal-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .modal-wide { width: 460px; }
 .modal-project-create { width: 420px; }
 

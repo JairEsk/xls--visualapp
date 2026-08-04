@@ -6,12 +6,13 @@
 // ---- I18N ----
 var i18n = {
   en: {
-    title: 'Stationery Manager',
+    title: 'Papelería',
+    windowContext: 'Inventory workspace',
     tabExplorer: 'Explorer',
     tabInventory: 'Inventory',
     tabRestock: 'Restock',
     tabHelp: 'Help',
-    newProject: 'New',
+    newProject: 'New Database',
     importExcel: 'Import',
     importExcelModal: 'Import Excel',
     exportExcel: 'Export',
@@ -58,6 +59,7 @@ var i18n = {
     renameStore: 'Rename Store',
     enterStoreName: 'Enter store name...',
     save: 'Save',
+    close: 'Close',
     productAdded: 'Product added.',
     productUpdated: 'Product updated.',
     productDeleted: 'Product deleted.',
@@ -67,6 +69,9 @@ var i18n = {
     deleteConfirmTitle: 'Delete Product',
     deleteConfirmDesc: 'Are you sure you want to delete',
     deleteConfirmBtn: 'Delete',
+    saleConfirmTitle: 'Complete Sale',
+    saleConfirmDesc: 'Are you sure you want to complete this sale?',
+    saleConfirmBtn: 'Complete Sale',
     nameRequired: 'Product name is required.',
     newProjectConfirm: 'Start a new project? This will clear all current products.',
     newProjectCleared: 'New project started. All products cleared.',
@@ -89,7 +94,7 @@ var i18n = {
     none: '(none)',
     dbManagerTitle: 'Projects',
     currentProject: 'Current:',
-    dbListEmptyText: 'No projects yet. Create one below.',
+    dbListEmptyText: 'No projects yet.',
     switchTo: 'Switched to: ',
     schemaHeaderCol: 'Column', schemaHeaderType: 'Type', schemaHeaderDesc: 'Description',
     schemaId: 'Unique product identifier',
@@ -121,12 +126,13 @@ var i18n = {
     cartItems: function (n) { return n + ' item' + (n !== 1 ? 's' : ''); }
   },
   es: {
-    title: 'Gestor de Papelería',
+    title: 'Papelería',
+    windowContext: 'Espacio de inventario',
     tabExplorer: 'Explorador',
     tabInventory: 'Inventario',
     tabRestock: 'Reestock',
     tabHelp: 'Ayuda',
-    newProject: 'Nuevo',
+    newProject: 'Nueva Base de Datos',
     importExcel: 'Importar',
     importExcelModal: 'Importar Excel',
     exportExcel: 'Exportar',
@@ -173,6 +179,7 @@ var i18n = {
     renameStore: 'Renombrar Tienda',
     enterStoreName: 'Nombre de la tienda...',
     save: 'Guardar',
+    close: 'Cerrar',
     productAdded: 'Producto agregado.',
     productUpdated: 'Producto actualizado.',
     productDeleted: 'Producto eliminado.',
@@ -182,6 +189,9 @@ var i18n = {
     deleteConfirmTitle: 'Eliminar Producto',
     deleteConfirmDesc: '¿Estás seguro de eliminar',
     deleteConfirmBtn: 'Eliminar',
+    saleConfirmTitle: 'Completar Venta',
+    saleConfirmDesc: '¿Estás seguro de completar esta venta?',
+    saleConfirmBtn: 'Completar Venta',
     nameRequired: 'El nombre del producto es obligatorio.',
     newProjectConfirm: '¿Iniciar un nuevo proyecto? Se borrarán todos los productos actuales.',
     newProjectCleared: 'Nuevo proyecto iniciado. Todos los productos fueron eliminados.',
@@ -204,7 +214,7 @@ var i18n = {
     none: '(ninguno)',
     dbManagerTitle: 'Proyectos',
     currentProject: 'Actual:',
-    dbListEmptyText: 'Sin proyectos aún. Crea uno abajo.',
+    dbListEmptyText: 'Sin proyectos aún.',
     switchTo: 'Proyecto cambiado: ',
     schemaHeaderCol: 'Columna', schemaHeaderType: 'Tipo', schemaHeaderDesc: 'Descripción',
     schemaId: 'Identificador único del producto',
@@ -244,7 +254,7 @@ var lang = 'en';
 var currentDbName = '';
 var pendingDeleteId = null;
 var lastAutoFilledId = '';
-var DEFAULT_TITLE = 'Stationery Manager';
+var DEFAULT_TITLE = 'Papelería';
 
 // ---- DOM UTILITIES ----
 function $id(id)          { return document.getElementById(id); }

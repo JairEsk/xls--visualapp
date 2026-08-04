@@ -38,7 +38,10 @@ function renderTable(data) {
       '<td class="' + (profit > 0 ? 'profit-positive' : 'profit-negative') + '">' + formatProfit(profit) + '</td>' +
       '<td><span class="stock-chip ' + stockClass + '">' + p.stock + '</span></td>' +
       '<td>' + boxBadge + '</td>' +
-      '<td class="actions-cell"><button class="btn btn-small btn-delete-icon" title="' + t('delete') + '" aria-label="' + t('delete') + '">' + t('delete') + '</button></td>';
+      '<td class="actions-cell">' +
+        '<button class="btn btn-small btn-edit-icon" title="' + t('edit') + '" aria-label="' + t('edit') + '">' + t('edit') + '</button>' +
+        '<button class="btn btn-small btn-delete-icon" title="' + t('delete') + '" aria-label="' + t('delete') + '">' + t('delete') + '</button>' +
+      '</td>';
     tableBody.appendChild(tr);
   });
 
@@ -67,16 +70,35 @@ function filterTable() {
 
 // ---- CATEGORIES ----
 var categorySelect = $id('category');
+var categoryDatalist = $id('categoryList');
 
 function updateCategoryOptions() {
-  if (!categorySelect) return;
-  categorySelect.innerHTML = '<option value="">' + t('categorySelect') + '</option>';
+  if (!categoryDatalist) return;
+  categoryDatalist.innerHTML = '';
+  
+  // 1. Default categories from i18n
   var cats = i18n[lang].categories;
   Object.keys(cats).forEach(function (key) {
     var opt = document.createElement('option');
     opt.value = key;
     opt.textContent = cats[key];
-    categorySelect.appendChild(opt);
+    categoryDatalist.appendChild(opt);
+  });
+
+  // 2. Unique custom categories in DB
+  var uniqueCats = {};
+  if (Array.isArray(products)) {
+    products.forEach(function (p) {
+      if (p.category && !cats[p.category]) {
+        uniqueCats[p.category] = true;
+      }
+    });
+  }
+  Object.keys(uniqueCats).forEach(function (cat) {
+    var opt = document.createElement('option');
+    opt.value = cat;
+    opt.textContent = cat;
+    categoryDatalist.appendChild(opt);
   });
 }
 
@@ -107,7 +129,7 @@ function getFormData() {
     id:               (idInput ? idInput.value.trim() : '') || getNextId(),
     name:             nameInput ? nameInput.value.trim() : '',
     barcode:          barcodeInput ? barcodeInput.value.trim() : '',
-    category:         categorySelect ? categorySelect.value : '',
+    category:         categorySelect ? categorySelect.value.trim() : '',
     purchasePrice:    parseFloat(purchasePriceInput ? purchasePriceInput.value : 0) || 0,
     salePrice:        parseFloat(salePriceInput ? salePriceInput.value : 0) || 0,
     stock:            parseInt(stockInput ? stockInput.value : 0) || 0,
@@ -152,6 +174,7 @@ function resetForm() {
   if (boxUnitProfitEl) { boxUnitProfitEl.textContent = '--'; boxUnitProfitEl.className = 'metric-value'; }
   if (boxTotalProfitEl){ boxTotalProfitEl.textContent = '--'; boxTotalProfitEl.className = 'metric-value'; }
   translateAllUI();
+  updateCategoryOptions();
 }
 
 function updateProfitCalculations() {
@@ -280,9 +303,19 @@ if (deleteConfirmOverlay) {
   });
 }
 
-// ---- TABLE DELETE ----
+// ---- TABLE ACTIONS ----
 if (tableBody) {
   tableBody.addEventListener('click', function (e) {
+    var editBtn = e.target.closest('.btn-edit-icon');
+    if (editBtn) {
+      e.stopPropagation();
+      var row = editBtn.closest('tr');
+      if (row && row.dataset.id) {
+        var product = findProduct(row.dataset.id);
+        if (product) fillForm(product);
+      }
+      return;
+    }
     var delBtn = e.target.closest('.btn-delete-icon');
     if (delBtn) {
       e.stopPropagation();
@@ -314,7 +347,7 @@ if (modalImportBtn) {
       cart = [];
       renderCart();
       renderTable();
-      var projectOverlay = $id('newProjectOverlay');
+      var projectOverlay = $id('projectsOverlay');
       if (projectOverlay) projectOverlay.classList.add('hidden');
     } catch (err) { console.error(err); showToast(t('importFailed'), 'error'); }
   });

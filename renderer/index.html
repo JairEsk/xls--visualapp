@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'">
-  <title>Stationery Manager</title>
+  <title>Papelería</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header>
+  <div class="app-chrome">
+    <header>
     <div class="header-left">
-      <h1 class="store-title" id="storeTitle" title="Click to rename">Stationery Manager</h1>
+      <h1 class="store-title" id="storeTitle" title="Click to rename">Papelería</h1>
       <span class="edit-icon" id="editTitleBtn">&#9998;</span>
     </div>
     <div class="header-center">
@@ -25,8 +26,10 @@
       <button id="btnNew" class="btn btn-ghost-light">New</button>
       <button id="btnExport" class="btn btn-ghost-light">Export</button>
     </div>
-  </header>
+    </header>
+  </div>
 
+  <div class="app-scroll">
   <main>
     <!-- TAB: EXPLORER / POS -->
     <section class="tab-panel" id="tab-explorer">
@@ -83,9 +86,8 @@
             </div>
             <div class="form-group">
               <label for="category">Category</label>
-              <select id="category">
-                <option value="">Select...</option>
-              </select>
+              <input type="text" id="category" list="categoryList" placeholder="e.g. Notebooks" required>
+              <datalist id="categoryList"></datalist>
             </div>
           </div>
           <div class="form-row">
@@ -202,6 +204,7 @@
       <button id="langToggleBtn" class="btn btn-lang" title="Switch language / Cambiar idioma">ES</button>
     </div>
   </footer>
+  </div>
 
   <div id="toast" class="toast hidden"></div>
   <div class="modal-overlay hidden" id="modalOverlay">
@@ -226,21 +229,42 @@
     </div>
   </div>
 
+  <div class="modal-overlay hidden" id="saleConfirmOverlay">
+    <div class="modal">
+      <h3 id="saleConfirmTitle">Complete Sale</h3>
+      <p id="saleConfirmDesc" class="modal-desc">Are you sure you want to complete this sale?</p>
+      <div class="modal-actions">
+        <button class="btn btn-success" id="saleConfirmBtn">Complete Sale</button>
+        <button class="btn btn-ghost" id="saleCancelBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-overlay hidden" id="newProjectOverlay">
-    <div class="modal modal-wide">
-      <h3 id="dbManagerTitle">Projects</h3>
-      <p id="currentProjectLabel" class="modal-desc">Current: <strong id="currentProjectName"></strong></p>
-      <div class="db-list" id="dbList"></div>
-      <div class="db-list-empty hidden" id="dbListEmpty">No projects yet. Create one below.</div>
+    <div class="modal modal-project-create">
+      <h3 id="newProjectModalTitle">New Project</h3>
+      <p id="newProjectDescText" class="modal-desc">Enter a name for the new database.</p>
       <div class="db-create-row">
         <input type="text" id="newProjectInput" placeholder="New project name..." maxlength="60">
         <button class="btn btn-primary btn-icon" id="newProjectSave" title="Create">+</button>
       </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="newProjectCancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay hidden" id="projectsOverlay">
+    <div class="modal modal-wide">
+      <h3 id="dbManagerTitle">Projects</h3>
+      <p id="currentProjectLabel" class="modal-desc">Current: <strong id="currentProjectName"></strong></p>
+      <div class="db-list" id="dbList"></div>
+      <div class="db-list-empty hidden" id="dbListEmpty">No projects yet.</div>
       <div class="db-import-row">
         <button class="btn btn-ghost btn-import-db" id="modalImportBtn">Import Excel</button>
       </div>
       <div class="modal-actions">
-        <button class="btn btn-ghost" id="newProjectCancel">Close</button>
+        <button class="btn btn-ghost" id="projectsClose">Close</button>
       </div>
     </div>
   </div>

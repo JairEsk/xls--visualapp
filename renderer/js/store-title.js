@@ -8,6 +8,10 @@ var modalCancel   = $id('modalCancel');
 
 function loadTitle() {
   var s = localStorage.getItem('storeTitle');
+  if (s === 'Stationery Manager' || s === 'Gestor de Papelería') {
+    s = DEFAULT_TITLE;
+    localStorage.setItem('storeTitle', s);
+  }
   if (storeTitle) storeTitle.textContent = s || DEFAULT_TITLE;
 }
 

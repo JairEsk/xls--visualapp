@@ -28,7 +28,8 @@ function translateAllUI() {
   setText('tabInventoryBtn', 'tabInventory');
   setText('tabRestockText',  'tabRestock');
   setText('tabHelpBtn',      'tabHelp');
-  setText('btnNew',          'newProject');
+  setText('btnProjects',     'dbManagerTitle');
+  setText('btnCreateNewDb',  'newProject');
   setText('btnExport',       'exportExcel');
 
   var editingInput = $id('editingId');

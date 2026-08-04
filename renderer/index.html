@@ -23,7 +23,7 @@
     </div>
     <div class="header-actions">
       <span id="dbNameLabel" class="db-name-label"></span>
-      <button id="btnNew" class="btn btn-ghost-light">New</button>
+      <button id="btnProjects" class="btn btn-ghost-light">Projects</button>
       <button id="btnExport" class="btn btn-ghost-light">Export</button>
     </div>
     </header>
@@ -280,8 +280,9 @@
       <p id="currentProjectLabel" class="modal-desc">Current: <strong id="currentProjectName"></strong></p>
       <div class="db-list" id="dbList"></div>
       <div class="db-list-empty hidden" id="dbListEmpty">No projects yet.</div>
-      <div class="db-import-row">
-        <button class="btn btn-ghost btn-import-db" id="modalImportBtn">Import Excel</button>
+      <div class="db-import-row" style="display: flex; gap: 8px; margin-top: 8px;">
+        <button class="btn btn-primary" id="btnCreateNewDb" style="flex: 1;">+ New Database</button>
+        <button class="btn btn-ghost" id="modalImportBtn" style="flex: 1;">Import Excel</button>
       </div>
       <div class="modal-actions">
         <button class="btn btn-ghost" id="projectsClose">Close</button>

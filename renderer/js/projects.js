@@ -30,9 +30,17 @@ function closeProjectsModal() {
   if (projectsOverlay) projectsOverlay.classList.add('hidden');
 }
 
-var btnNew = $id('btnNew');
-if (btnNew) {
-  btnNew.addEventListener('click', openNewProjectModal);
+var btnProjects = $id('btnProjects');
+if (btnProjects) {
+  btnProjects.addEventListener('click', openProjectsModal);
+}
+
+var btnCreateNewDb = $id('btnCreateNewDb');
+if (btnCreateNewDb) {
+  btnCreateNewDb.addEventListener('click', function () {
+    closeProjectsModal();
+    openNewProjectModal();
+  });
 }
 
 if (dbNameLabel) {

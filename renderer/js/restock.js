@@ -8,6 +8,16 @@ function renderRestock() {
 
   var lowStock = products.filter(function (p) { return Number(p.stock) <= LOW_STOCK_THRESHOLD; });
 
+  var badge = $id('restockTabBadge');
+  if (badge) {
+    if (lowStock.length > 0) {
+      badge.textContent = lowStock.length;
+      badge.classList.remove('hidden');
+    } else {
+      badge.classList.add('hidden');
+    }
+  }
+
   if (lowStock.length === 0) {
     grid.innerHTML = '';
     if (emptyEl) emptyEl.style.display = '';

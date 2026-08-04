@@ -23,9 +23,10 @@ if (langToggleBtn) {
 // ---- TRANSLATE ALL UI ----
 function translateAllUI() {
   document.title = t('title');
+  loadTitle();
   setText('tabExplorerBtn',  'tabExplorer');
   setText('tabInventoryBtn', 'tabInventory');
-  setText('tabRestockBtn',   'tabRestock');
+  setText('tabRestockText',  'tabRestock');
   setText('tabHelpBtn',      'tabHelp');
   setText('btnNew',          'newProject');
   setText('btnExport',       'exportExcel');

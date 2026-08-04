@@ -6,7 +6,7 @@
 // ---- I18N ----
 var i18n = {
   en: {
-    title: 'Papelería',
+    title: 'Inventory Manager',
     windowContext: 'Inventory workspace',
     tabExplorer: 'Explorer',
     tabInventory: 'Inventory',
@@ -126,7 +126,7 @@ var i18n = {
     cartItems: function (n) { return n + ' item' + (n !== 1 ? 's' : ''); }
   },
   es: {
-    title: 'Papelería',
+    title: 'Gestor de Inventario',
     windowContext: 'Espacio de inventario',
     tabExplorer: 'Explorador',
     tabInventory: 'Inventario',
@@ -254,7 +254,7 @@ var lang = 'en';
 var currentDbName = '';
 var pendingDeleteId = null;
 var lastAutoFilledId = '';
-var DEFAULT_TITLE = 'Papelería';
+var DEFAULT_TITLE = 'Inventory Manager';
 
 // ---- DOM UTILITIES ----
 function $id(id)          { return document.getElementById(id); }

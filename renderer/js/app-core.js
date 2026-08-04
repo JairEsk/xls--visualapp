@@ -272,9 +272,31 @@ function escapeHtml(str)  { var d = document.createElement('div'); d.textContent
 
 function t(key) {
   var dict = i18n[lang] || i18n.en;
-  var val = dict[key];
+  var val;
+  if (typeof key === 'string' && key.indexOf('.') !== -1) {
+    var parts = key.split('.');
+    var current = dict;
+    for (var i = 0; i < parts.length; i++) {
+      if (current == null) { current = undefined; break; }
+      current = current[parts[i]];
+    }
+    val = current;
+    if (val === undefined && dict !== i18n.en) {
+      current = i18n.en;
+      for (var i = 0; i < parts.length; i++) {
+        if (current == null) { current = undefined; break; }
+        current = current[parts[i]];
+      }
+      val = current;
+    }
+  } else {
+    val = dict[key];
+    if (val === undefined && dict !== i18n.en) {
+      val = i18n.en[key];
+    }
+  }
   if (typeof val === 'function') return val.apply(null, Array.prototype.slice.call(arguments, 1));
-  return val !== undefined ? val : (i18n.en[key] || key);
+  return val !== undefined ? val : key;
 }
 
 function setText(elOrId, key) {

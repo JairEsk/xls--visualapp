@@ -9,9 +9,20 @@ var i18n = {
     title: 'Inventory Manager',
     windowContext: 'Inventory workspace',
     tabExplorer: 'Explorer',
+    tabAdmin: 'Admin',
     tabInventory: 'Inventory',
     tabRestock: 'Restock',
     tabHelp: 'Help',
+    lblAdminTitle: 'Admin Panel',
+    tabProjectsText: 'Database',
+    tabConfigsText: 'Settings',
+    configsTitle: 'Settings & Theme',
+    configsStoreName: 'Store Name',
+    configsThemeColor: 'Theme Accent Color',
+    configsSaveBtn: 'Save Changes',
+    configsThemeCustom: 'Custom Color',
+    configsThemePresets: 'Presets',
+    configsSaved: 'Settings saved successfully.',
     newProject: 'New Database',
     importExcel: 'Import',
     importExcelModal: 'Import Excel',
@@ -72,6 +83,10 @@ var i18n = {
     saleConfirmTitle: 'Complete Sale',
     saleConfirmDesc: 'Are you sure you want to complete this sale?',
     saleConfirmBtn: 'Complete Sale',
+    lblConfirmTotal: 'Total:',
+    lblCashReceived: 'Cash Received',
+    lblChangeDue: 'Change Due',
+    insufficientCash: 'Insufficient Cash',
     nameRequired: 'Product name is required.',
     newProjectConfirm: 'Start a new project? This will clear all current products.',
     newProjectCleared: 'New project started. All products cleared.',
@@ -123,15 +138,39 @@ var i18n = {
     saleCompleted: 'Sale completed.',
     saleCancelled: 'Sale cancelled.',
     insufficientStock: 'Insufficient stock for',
-    cartItems: function (n) { return n + ' item' + (n !== 1 ? 's' : ''); }
+    cartItems: function (n) { return n + ' item' + (n !== 1 ? 's' : ''); },
+    tabSales: 'Ledger',
+    salesTitle: 'Sales Ledger',
+    salesEmpty: 'No sales registered yet.',
+    salesCountLabel: 'Sales',
+    salesRevenueLabel: 'Revenue',
+    salesAvgLabel: 'Avg Ticket',
+    thSalesDate: 'Date / Time',
+    thSalesItems: 'Qty',
+    thSalesDetails: 'Details',
+    thSalesReceived: 'Received',
+    thSalesChange: 'Change',
+    thSalesMethod: 'Payment',
+    thSalesTotal: 'Total'
   },
   es: {
     title: 'Gestor de Inventario',
     windowContext: 'Espacio de inventario',
     tabExplorer: 'Explorador',
+    tabAdmin: 'Admin',
     tabInventory: 'Inventario',
     tabRestock: 'Reestock',
     tabHelp: 'Ayuda',
+    lblAdminTitle: 'Panel Admin',
+    tabProjectsText: 'Base de Datos',
+    tabConfigsText: 'Ajustes',
+    configsTitle: 'Ajustes y Tema',
+    configsStoreName: 'Nombre de la Papelería',
+    configsThemeColor: 'Color de Acento del Tema',
+    configsSaveBtn: 'Guardar Cambios',
+    configsThemeCustom: 'Color Personalizado',
+    configsThemePresets: 'Preestablecidos',
+    configsSaved: 'Ajustes guardados correctamente.',
     newProject: 'Nueva Base de Datos',
     importExcel: 'Importar',
     importExcelModal: 'Importar Excel',
@@ -192,6 +231,10 @@ var i18n = {
     saleConfirmTitle: 'Completar Venta',
     saleConfirmDesc: '¿Estás seguro de completar esta venta?',
     saleConfirmBtn: 'Completar Venta',
+    lblConfirmTotal: 'Total:',
+    lblCashReceived: 'Dinero Recibido',
+    lblChangeDue: 'Cambio / Vuelto',
+    insufficientCash: 'Dinero Insuficiente',
     nameRequired: 'El nombre del producto es obligatorio.',
     newProjectConfirm: '¿Iniciar un nuevo proyecto? Se borrarán todos los productos actuales.',
     newProjectCleared: 'Nuevo proyecto iniciado. Todos los productos fueron eliminados.',
@@ -243,12 +286,26 @@ var i18n = {
     saleCompleted: 'Venta completada.',
     saleCancelled: 'Venta cancelada.',
     insufficientStock: 'Stock insuficiente para',
-    cartItems: function (n) { return n + ' producto' + (n !== 1 ? 's' : ''); }
+    cartItems: function (n) { return n + ' producto' + (n !== 1 ? 's' : ''); },
+    tabSales: 'Historial',
+    salesTitle: 'Historial de Ventas',
+    salesEmpty: 'No hay ventas registradas aún.',
+    salesCountLabel: 'Ventas',
+    salesRevenueLabel: 'Ingresos',
+    salesAvgLabel: 'Ticket Prom.',
+    thSalesDate: 'Fecha / Hora',
+    thSalesItems: 'Cant.',
+    thSalesDetails: 'Detalles',
+    thSalesReceived: 'Recibido',
+    thSalesChange: 'Cambio',
+    thSalesMethod: 'Pago',
+    thSalesTotal: 'Total'
   }
 };
 
 // ---- APPLICATION STATE ----
 var products = [];
+var sales = [];
 var cart = [];
 var lang = 'en';
 var currentDbName = '';
@@ -264,9 +321,31 @@ function escapeHtml(str)  { var d = document.createElement('div'); d.textContent
 
 function t(key) {
   var dict = i18n[lang] || i18n.en;
-  var val = dict[key];
+  var val;
+  if (typeof key === 'string' && key.indexOf('.') !== -1) {
+    var parts = key.split('.');
+    var current = dict;
+    for (var i = 0; i < parts.length; i++) {
+      if (current == null) { current = undefined; break; }
+      current = current[parts[i]];
+    }
+    val = current;
+    if (val === undefined && dict !== i18n.en) {
+      current = i18n.en;
+      for (var i = 0; i < parts.length; i++) {
+        if (current == null) { current = undefined; break; }
+        current = current[parts[i]];
+      }
+      val = current;
+    }
+  } else {
+    val = dict[key];
+    if (val === undefined && dict !== i18n.en) {
+      val = i18n.en[key];
+    }
+  }
   if (typeof val === 'function') return val.apply(null, Array.prototype.slice.call(arguments, 1));
-  return val !== undefined ? val : (i18n.en[key] || key);
+  return val !== undefined ? val : key;
 }
 
 function setText(elOrId, key) {
@@ -318,8 +397,25 @@ function findProductIndex(id) {
 // ---- TABS ----
 var tabs          = $selAll('.tab');
 var tabPanels     = $selAll('.tab-panel');
+var adminTabs     = $selAll('.admin-tab');
+var adminSubpanels = $selAll('.admin-subpanel');
+
+function switchAdminTab(subtabName) {
+  adminTabs.forEach(function (t) { t.classList.remove('active'); });
+  adminSubpanels.forEach(function (p) { p.classList.add('hidden'); });
+  var tabEl = $sel('.admin-tab[data-subtab="' + subtabName + '"]');
+  var panelEl = $id('tab-' + subtabName);
+  if (tabEl) tabEl.classList.add('active');
+  if (panelEl) panelEl.classList.remove('hidden');
+}
 
 function switchTab(tabName) {
+  var subTabs = ['inventory', 'restock', 'sales', 'help', 'projects', 'configs'];
+  if (subTabs.indexOf(tabName) !== -1) {
+    switchTab('admin');
+    switchAdminTab(tabName);
+    return;
+  }
   tabs.forEach(function (t) { t.classList.remove('active'); });
   tabPanels.forEach(function (p) { p.classList.add('hidden'); });
   var tabEl   = $sel('.tab[data-tab="' + tabName + '"]');
@@ -332,6 +428,10 @@ tabs.forEach(function (tab) {
   tab.addEventListener('click', function () { switchTab(tab.dataset.tab); });
 });
 
+adminTabs.forEach(function (tab) {
+  tab.addEventListener('click', function () { switchAdminTab(tab.dataset.subtab); });
+});
+
 // ---- PERSISTENCE ----
 function apiAvailable() {
   return window.api && typeof window.api.getProducts === 'function';
@@ -339,7 +439,11 @@ function apiAvailable() {
 
 async function loadFromDB() {
   if (!apiAvailable()) return;
-  try { products = await window.api.getProducts(currentDbName); refreshProductViews(); }
+  try {
+    products = await window.api.getProducts(currentDbName);
+    try { sales = await window.api.getSales(currentDbName); } catch (e) { sales = []; }
+    refreshProductViews();
+  }
   catch (err) { console.error(err); showToast(t('dbLoadError'), 'error'); }
 }
 

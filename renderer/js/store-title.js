@@ -1,4 +1,4 @@
-// ---- STORE TITLE (modal) ----
+// ---- STORE TITLE & CONFIGS ----
 var storeTitle    = $id('storeTitle');
 var editTitleBtn  = $id('editTitleBtn');
 var modalOverlay  = $id('modalOverlay');
@@ -15,6 +15,9 @@ function loadTitle() {
   var currentTitle = s || t('title');
   if (storeTitle) storeTitle.textContent = currentTitle;
   document.title = currentTitle;
+
+  var cfgInput = $id('cfgStoreNameInput');
+  if (cfgInput) cfgInput.value = currentTitle;
 }
 
 function saveTitle(title) {
@@ -56,5 +59,82 @@ if (modalInput) {
   modalInput.addEventListener('keydown', function (e) {
     if (e.key === 'Enter'  && modalSave)   modalSave.click();
     if (e.key === 'Escape' && modalCancel) modalCancel.click();
+  });
+}
+
+// Config Panel store title save
+var btnSaveStoreName = $id('btnSaveStoreName');
+if (btnSaveStoreName) {
+  btnSaveStoreName.addEventListener('click', function () {
+    var cfgInput = $id('cfgStoreNameInput');
+    var v = cfgInput ? cfgInput.value.trim() : '';
+    if (v) {
+      saveTitle(v);
+      showToast(t('configsSaved'), 'success');
+    }
+  });
+}
+
+// ---- THEME COLOR CUSTOMIZATION ----
+function applyThemeColor(hex) {
+  if (!hex || !/^#[0-9A-F]{6}$/i.test(hex)) {
+    hex = '#2f6f62'; // Default
+  }
+
+  var r = parseInt(hex.substring(1, 3), 16);
+  var g = parseInt(hex.substring(3, 5), 16);
+  var b = parseInt(hex.substring(5, 7), 16);
+
+  // Darken by 15% for hover
+  var rh = Math.max(0, Math.floor(r * 0.85));
+  var gh = Math.max(0, Math.floor(g * 0.85));
+  var bh = Math.max(0, Math.floor(b * 0.85));
+  var hoverHex = '#' +
+    rh.toString(16).padStart(2, '0') +
+    gh.toString(16).padStart(2, '0') +
+    bh.toString(16).padStart(2, '0');
+
+  var root = document.documentElement;
+  root.style.setProperty('--primary', hex);
+  root.style.setProperty('--primary-hover', hoverHex);
+  root.style.setProperty('--primary-light', 'rgba(' + r + ', ' + g + ', ' + b + ', 0.10)');
+  root.style.setProperty('--primary-border', 'rgba(' + r + ', ' + g + ', ' + b + ', 0.24)');
+
+  localStorage.setItem('themeColor', hex);
+
+  // Highlight active preset button
+  var presetBtns = document.querySelectorAll('.color-preset-btn');
+  presetBtns.forEach(function (btn) {
+    if (btn.dataset.color.toLowerCase() === hex.toLowerCase()) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+
+  var picker = $id('cfgThemeColorPicker');
+  if (picker && picker.value.toLowerCase() !== hex.toLowerCase()) {
+    picker.value = hex;
+  }
+}
+
+// Initialize theme color
+(function initTheme() {
+  var savedColor = localStorage.getItem('themeColor') || '#2f6f62';
+  applyThemeColor(savedColor);
+})();
+
+// Preset theme button clicks
+document.querySelectorAll('.color-preset-btn').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    applyThemeColor(btn.dataset.color);
+  });
+});
+
+// Color picker change event
+var themeColorPicker = $id('cfgThemeColorPicker');
+if (themeColorPicker) {
+  themeColorPicker.addEventListener('input', function () {
+    applyThemeColor(themeColorPicker.value);
   });
 }

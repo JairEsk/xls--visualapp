@@ -27,6 +27,7 @@ function removeFromCart(index) {
   renderCart();
 }
 
+// Update quantity from cart buttons
 function updateCartQuantity(index, delta) {
   var item = cart[index];
   var newQty = item.quantity + delta;
@@ -52,15 +53,19 @@ function renderCart() {
   var cartBody = $id('cartBody');
   var cartItemCount = $id('cartItemCount');
   var cartTotalValue = $id('cartTotalValue');
+  var posLayout = $sel('.pos-layout');
 
   var totals = calculateCartTotals();
 
   if (cart.length === 0) {
+    if (posLayout) posLayout.classList.add('cart-empty-layout');
     cartBody.innerHTML = '<div class="cart-empty" id="cartEmptyMsg">' + t('cartEmptyText') + '</div>';
     if (cartItemCount) cartItemCount.textContent = t('cartItems', 0);
     if (cartTotalValue) cartTotalValue.textContent = '$0.00';
     return;
   }
+
+  if (posLayout) posLayout.classList.remove('cart-empty-layout');
 
   var html = '<div class="cart-items">';
   cart.forEach(function (item, i) {
@@ -91,10 +96,73 @@ var saleConfirmOverlay = $id('saleConfirmOverlay');
 var saleConfirmBtn = $id('saleConfirmBtn');
 var saleCancelBtn = $id('saleCancelBtn');
 
+function getQuickCashSuggestions(total) {
+  var denoms = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000];
+  var filtered = denoms.filter(function(d) { return d >= total; });
+  var suggestions = filtered.slice(0, 3);
+  if (suggestions.indexOf(total) === -1) {
+    suggestions.unshift(total);
+  }
+  return suggestions.filter(function(v, i, self) { return self.indexOf(v) === i; }).slice(0, 4);
+}
+
+function updateChangeCalculation(total) {
+  var cashInput = $id('cashReceived');
+  var changeDueVal = $id('changeDueVal');
+  var lblChangeDue = $id('lblChangeDue');
+  var saleConfirmBtn = $id('saleConfirmBtn');
+  var saleConfirmChangeRow = $id('saleConfirmChangeRow');
+  
+  if (!cashInput || !changeDueVal || !saleConfirmBtn) return;
+  
+  var cashVal = parseFloat(cashInput.value);
+  if (isNaN(cashVal) || cashInput.value.trim() === '') {
+    changeDueVal.textContent = formatCurrency(0);
+    if (lblChangeDue) lblChangeDue.textContent = t('lblChangeDue');
+    if (saleConfirmChangeRow) saleConfirmChangeRow.classList.remove('insufficient-cash');
+    saleConfirmBtn.disabled = false;
+    return;
+  }
+  
+  var change = cashVal - total;
+  if (change < 0) {
+    changeDueVal.textContent = formatCurrency(Math.abs(change));
+    if (lblChangeDue) lblChangeDue.textContent = t('insufficientCash');
+    if (saleConfirmChangeRow) saleConfirmChangeRow.classList.add('insufficient-cash');
+    saleConfirmBtn.disabled = true;
+  } else {
+    changeDueVal.textContent = formatCurrency(change);
+    if (lblChangeDue) lblChangeDue.textContent = t('lblChangeDue');
+    if (saleConfirmChangeRow) saleConfirmChangeRow.classList.remove('insufficient-cash');
+    saleConfirmBtn.disabled = false;
+  }
+}
+
+function generateQuickCashButtons(total) {
+  var container = $id('quickCashBtns');
+  if (!container) return;
+  container.innerHTML = '';
+  
+  var suggestions = getQuickCashSuggestions(total);
+  suggestions.forEach(function(val) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn-quick-cash';
+    btn.textContent = formatCurrency(val);
+    btn.addEventListener('click', function() {
+      var cashInput = $id('cashReceived');
+      if (cashInput) {
+        cashInput.value = val.toFixed(2);
+        updateChangeCalculation(total);
+      }
+    });
+    container.appendChild(btn);
+  });
+}
+
 function openSaleConfirmModal() {
   if (cart.length === 0) return;
   
-  // stock check first
   for (var i = 0; i < cart.length; i++) {
     var item = cart[i];
     var freshProduct = findProduct(item.product.id);
@@ -104,12 +172,36 @@ function openSaleConfirmModal() {
     }
   }
 
+  var totals = calculateCartTotals();
+  var totalVal = totals.total;
+
+  var saleConfirmTotalVal = $id('saleConfirmTotalVal');
+  if (saleConfirmTotalVal) saleConfirmTotalVal.textContent = formatCurrency(totalVal);
+
+  var cashInput = $id('cashReceived');
+  if (cashInput) {
+    cashInput.value = '';
+  }
+
   if (saleConfirmOverlay) {
     saleConfirmOverlay.classList.remove('hidden');
     setText('saleConfirmTitle', 'saleConfirmTitle');
     setText('saleConfirmDesc', 'saleConfirmDesc');
+    setText('lblConfirmTotal', 'lblConfirmTotal');
+    setText('lblCashReceived', 'lblCashReceived');
+    setText('lblChangeDue', 'lblChangeDue');
     setText('saleConfirmBtn', 'saleConfirmBtn');
     setText('saleCancelBtn', 'cancel');
+  }
+
+  updateChangeCalculation(totalVal);
+  generateQuickCashButtons(totalVal);
+
+  if (cashInput) {
+    setTimeout(function() {
+      cashInput.focus();
+      cashInput.select();
+    }, 100);
   }
 }
 
@@ -134,6 +226,24 @@ if (saleConfirmOverlay) {
   });
 }
 
+var cashReceivedInput = $id('cashReceived');
+if (cashReceivedInput) {
+  cashReceivedInput.addEventListener('input', function() {
+    var totals = calculateCartTotals();
+    updateChangeCalculation(totals.total);
+  });
+  
+  cashReceivedInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      var btn = $id('saleConfirmBtn');
+      if (btn && !btn.disabled) {
+        btn.click();
+      }
+    }
+  });
+}
+
 async function executeCompleteSale() {
   for (var i = 0; i < cart.length; i++) {
     var item = cart[i];
@@ -144,13 +254,54 @@ async function executeCompleteSale() {
     }
   }
 
+  var totals = calculateCartTotals();
+  var cashInput = $id('cashReceived');
+  var cashVal = cashInput ? parseFloat(cashInput.value) : 0;
+  if (isNaN(cashVal)) cashVal = 0;
+  var changeVal = cashVal > 0 ? (cashVal - totals.total) : 0;
+  if (changeVal < 0) changeVal = 0;
+
+  var detailsArray = cart.map(function (item) {
+    return item.quantity + 'x ' + item.product.name + ' ($' + item.product.salePrice.toFixed(2) + ' c/u)';
+  });
+  var detailsStr = detailsArray.join(', ');
+
+  var now = new Date();
+  var yyyy = now.getFullYear();
+  var mm = String(now.getMonth() + 1).padStart(2, '0');
+  var dd = String(now.getDate()).padStart(2, '0');
+  var hh = String(now.getHours()).padStart(2, '0');
+  var min = String(now.getMinutes()).padStart(2, '0');
+  var ss = String(now.getSeconds()).padStart(2, '0');
+  var formattedDate = yyyy + '-' + mm + '-' + dd + ' ' + hh + ':' + min + ':' + ss;
+
+  var paymentMethod = cashVal > 0 ? (lang === 'es' ? 'Efectivo' : 'Cash') : (lang === 'es' ? 'Efectivo' : 'Cash');
+
+  var newSale = {
+    date: formattedDate,
+    total: totals.total,
+    itemsCount: totals.totalItems,
+    paymentMethod: paymentMethod,
+    details: detailsStr,
+    received: cashVal > 0 ? cashVal : totals.total,
+    change: changeVal
+  };
+
   cart.forEach(function (item) {
     var product = findProduct(item.product.id);
     if (product) product.stock -= item.quantity;
   });
 
-  await saveToDB();
-  await loadFromDB();
+  sales.push(newSale);
+
+  try {
+    await saveToDB();
+    await window.api.saveSales(sales, currentDbName);
+    await loadFromDB();
+  } catch (err) {
+    console.error(err);
+    showToast(t('dbSaveError'), 'error');
+  }
 
   cart = [];
   renderCart();

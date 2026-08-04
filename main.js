@@ -1,6 +1,6 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
-const { loadProducts, saveProducts, HEADERS } = require('./database');
+const { loadProducts, saveProducts, loadSales, saveSales, HEADERS } = require('./database');
 
 let mainWindow;
 
@@ -41,6 +41,14 @@ app.on('activate', () => {
 
 ipcMain.handle('db:getProducts', async (_event, dbName) => {
   return loadProducts(dbName);
+});
+
+ipcMain.handle('db:getSales', async (_event, dbName) => {
+  return loadSales(dbName);
+});
+
+ipcMain.handle('db:saveSales', async (_event, sales, dbName) => {
+  return saveSales(sales, dbName);
 });
 
 ipcMain.handle('db:saveProducts', async (_event, products, dbName) => {

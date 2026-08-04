@@ -25,10 +25,15 @@ function translateAllUI() {
   document.title = t('title');
   loadTitle();
   setText('tabExplorerBtn',  'tabExplorer');
+  setText('tabAdminText',    'tabAdmin');
+  setText('lblAdminTitle',   'lblAdminTitle');
+  setText('tabProjectsText', 'tabProjectsText');
   setText('tabInventoryBtn', 'tabInventory');
   setText('tabRestockText',  'tabRestock');
+  setText('tabSalesText',    'tabSales');
   setText('tabHelpBtn',      'tabHelp');
-  setText('btnNew',          'newProject');
+  // btnProjects is now inline tabProjectsBtn
+  setText('btnCreateNewDb',  'newProject');
   setText('btnExport',       'exportExcel');
 
   var editingInput = $id('editingId');
@@ -89,6 +94,17 @@ function translateAllUI() {
       '<tr><td>box_sale_price</td><td>number</td><td>' + t('schemaBoxSalePrice') + '</td></tr>';
   }
 
+  configsTab: {
+    setText('tabConfigsText',  'tabConfigsText');
+    setText('configsTitle',    'configsTitle');
+    setText('lblConfigsStoreName', 'configsStoreName');
+    setText('lblConfigsThemeColor', 'configsThemeColor');
+    setText('lblConfigsThemePresets', 'configsThemePresets');
+    setText('lblConfigsThemeCustom', 'configsThemeCustom');
+    setText('btnSaveStoreName', 'save');
+    placehold('cfgStoreNameInput', 'enterStoreName');
+  }
+
   titleModal: {
     el = $sel('#modal h3'); if (el) el.textContent = t('renameStore');
     placehold('modalInput', 'enterStoreName');
@@ -116,6 +132,9 @@ function translateAllUI() {
   saleConfirmModal: {
     setText('saleConfirmTitle', 'saleConfirmTitle');
     setText('saleConfirmDesc', 'saleConfirmDesc');
+    setText('lblConfirmTotal', 'lblConfirmTotal');
+    setText('lblCashReceived', 'lblCashReceived');
+    setText('lblChangeDue', 'lblChangeDue');
     setText('saleConfirmBtn', 'saleConfirmBtn');
     setText('saleCancelBtn', 'cancel');
   }
@@ -136,6 +155,23 @@ function translateAllUI() {
 
     var cartEmptyMsg = $id('cartEmptyMsg');
     if (cartEmptyMsg && cart.length === 0) cartEmptyMsg.textContent = t('cartEmptyText');
+  }
+
+  salesPanel: {
+    setText('lblSalesTitle',    'salesTitle');
+    setText('lblSalesCount',    'salesCountLabel');
+    setText('lblSalesRevenue',  'salesRevenueLabel');
+    setText('lblSalesAvg',      'salesAvgLabel');
+    setText('thSalesDate',      'thSalesDate');
+    setText('thSalesItems',     'thSalesItems');
+    setText('thSalesDetails',   'thSalesDetails');
+    setText('thSalesReceived',  'thSalesReceived');
+    setText('thSalesChange',    'thSalesChange');
+    setText('thSalesMethod',    'thSalesMethod');
+    setText('thSalesTotal',     'thSalesTotal');
+
+    var salesEmptyText = $id('salesEmptyText');
+    if (salesEmptyText && sales.length === 0) salesEmptyText.textContent = t('salesEmpty');
   }
 
   restockPanel: {

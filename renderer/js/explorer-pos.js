@@ -249,13 +249,54 @@ async function executeCompleteSale() {
     }
   }
 
+  var totals = calculateCartTotals();
+  var cashInput = $id('cashReceived');
+  var cashVal = cashInput ? parseFloat(cashInput.value) : 0;
+  if (isNaN(cashVal)) cashVal = 0;
+  var changeVal = cashVal > 0 ? (cashVal - totals.total) : 0;
+  if (changeVal < 0) changeVal = 0;
+
+  var detailsArray = cart.map(function (item) {
+    return item.quantity + 'x ' + item.product.name + ' ($' + item.product.salePrice.toFixed(2) + ' c/u)';
+  });
+  var detailsStr = detailsArray.join(', ');
+
+  var now = new Date();
+  var yyyy = now.getFullYear();
+  var mm = String(now.getMonth() + 1).padStart(2, '0');
+  var dd = String(now.getDate()).padStart(2, '0');
+  var hh = String(now.getHours()).padStart(2, '0');
+  var min = String(now.getMinutes()).padStart(2, '0');
+  var ss = String(now.getSeconds()).padStart(2, '0');
+  var formattedDate = yyyy + '-' + mm + '-' + dd + ' ' + hh + ':' + min + ':' + ss;
+
+  var paymentMethod = cashVal > 0 ? (lang === 'es' ? 'Efectivo' : 'Cash') : (lang === 'es' ? 'Efectivo' : 'Cash');
+
+  var newSale = {
+    date: formattedDate,
+    total: totals.total,
+    itemsCount: totals.totalItems,
+    paymentMethod: paymentMethod,
+    details: detailsStr,
+    received: cashVal > 0 ? cashVal : totals.total,
+    change: changeVal
+  };
+
   cart.forEach(function (item) {
     var product = findProduct(item.product.id);
     if (product) product.stock -= item.quantity;
   });
 
-  await saveToDB();
-  await loadFromDB();
+  sales.push(newSale);
+
+  try {
+    await saveToDB();
+    await window.api.saveSales(sales, currentDbName);
+    await loadFromDB();
+  } catch (err) {
+    console.error(err);
+    showToast(t('dbSaveError'), 'error');
+  }
 
   cart = [];
   renderCart();

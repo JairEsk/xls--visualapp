@@ -27,6 +27,7 @@ function translateAllUI() {
   setText('tabExplorerBtn',  'tabExplorer');
   setText('tabInventoryBtn', 'tabInventory');
   setText('tabRestockText',  'tabRestock');
+  setText('tabSalesText',    'tabSales');
   setText('tabHelpBtn',      'tabHelp');
   setText('btnProjects',     'dbManagerTitle');
   setText('btnCreateNewDb',  'newProject');
@@ -140,6 +141,23 @@ function translateAllUI() {
 
     var cartEmptyMsg = $id('cartEmptyMsg');
     if (cartEmptyMsg && cart.length === 0) cartEmptyMsg.textContent = t('cartEmptyText');
+  }
+
+  salesPanel: {
+    setText('lblSalesTitle',    'salesTitle');
+    setText('lblSalesCount',    'salesCountLabel');
+    setText('lblSalesRevenue',  'salesRevenueLabel');
+    setText('lblSalesAvg',      'salesAvgLabel');
+    setText('thSalesDate',      'thSalesDate');
+    setText('thSalesItems',     'thSalesItems');
+    setText('thSalesDetails',   'thSalesDetails');
+    setText('thSalesReceived',  'thSalesReceived');
+    setText('thSalesChange',    'thSalesChange');
+    setText('thSalesMethod',    'thSalesMethod');
+    setText('thSalesTotal',     'thSalesTotal');
+
+    var salesEmptyText = $id('salesEmptyText');
+    if (salesEmptyText && sales.length === 0) salesEmptyText.textContent = t('salesEmpty');
   }
 
   restockPanel: {

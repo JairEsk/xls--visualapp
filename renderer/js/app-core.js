@@ -127,7 +127,20 @@ var i18n = {
     saleCompleted: 'Sale completed.',
     saleCancelled: 'Sale cancelled.',
     insufficientStock: 'Insufficient stock for',
-    cartItems: function (n) { return n + ' item' + (n !== 1 ? 's' : ''); }
+    cartItems: function (n) { return n + ' item' + (n !== 1 ? 's' : ''); },
+    tabSales: 'Ledger',
+    salesTitle: 'Sales Ledger',
+    salesEmpty: 'No sales registered yet.',
+    salesCountLabel: 'Sales',
+    salesRevenueLabel: 'Revenue',
+    salesAvgLabel: 'Avg Ticket',
+    thSalesDate: 'Date / Time',
+    thSalesItems: 'Qty',
+    thSalesDetails: 'Details',
+    thSalesReceived: 'Received',
+    thSalesChange: 'Change',
+    thSalesMethod: 'Payment',
+    thSalesTotal: 'Total'
   },
   es: {
     title: 'Gestor de Inventario',
@@ -251,12 +264,26 @@ var i18n = {
     saleCompleted: 'Venta completada.',
     saleCancelled: 'Venta cancelada.',
     insufficientStock: 'Stock insuficiente para',
-    cartItems: function (n) { return n + ' producto' + (n !== 1 ? 's' : ''); }
+    cartItems: function (n) { return n + ' producto' + (n !== 1 ? 's' : ''); },
+    tabSales: 'Historial',
+    salesTitle: 'Historial de Ventas',
+    salesEmpty: 'No hay ventas registradas aún.',
+    salesCountLabel: 'Ventas',
+    salesRevenueLabel: 'Ingresos',
+    salesAvgLabel: 'Ticket Prom.',
+    thSalesDate: 'Fecha / Hora',
+    thSalesItems: 'Cant.',
+    thSalesDetails: 'Detalles',
+    thSalesReceived: 'Recibido',
+    thSalesChange: 'Cambio',
+    thSalesMethod: 'Pago',
+    thSalesTotal: 'Total'
   }
 };
 
 // ---- APPLICATION STATE ----
 var products = [];
+var sales = [];
 var cart = [];
 var lang = 'en';
 var currentDbName = '';
@@ -369,7 +396,11 @@ function apiAvailable() {
 
 async function loadFromDB() {
   if (!apiAvailable()) return;
-  try { products = await window.api.getProducts(currentDbName); refreshProductViews(); }
+  try {
+    products = await window.api.getProducts(currentDbName);
+    try { sales = await window.api.getSales(currentDbName); } catch (e) { sales = []; }
+    refreshProductViews();
+  }
   catch (err) { console.error(err); showToast(t('dbLoadError'), 'error'); }
 }
 

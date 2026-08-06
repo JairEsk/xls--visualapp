@@ -287,9 +287,14 @@ async function executeCompleteSale() {
     change: changeVal
   };
 
+  // Save original stock values for rollback on failure
+  var stockSnapshot = [];
   cart.forEach(function (item) {
     var product = findProduct(item.product.id);
-    if (product) product.stock -= item.quantity;
+    if (product) {
+      stockSnapshot.push({ id: product.id, originalStock: product.stock });
+      product.stock = Math.max(0, product.stock - item.quantity);
+    }
   });
 
   sales.push(newSale);
@@ -298,16 +303,19 @@ async function executeCompleteSale() {
     await saveToDB();
     await window.api.saveSales(sales, currentDbName);
     await loadFromDB();
+    cart = [];
+    refreshProductViews();
+    showToast(t('saleCompleted'), 'success');
   } catch (err) {
     console.error(err);
+    // Rollback stock deductions on failure
+    stockSnapshot.forEach(function (snap) {
+      var product = findProduct(snap.id);
+      if (product) product.stock = snap.originalStock;
+    });
+    sales.pop();
     showToast(t('dbSaveError'), 'error');
   }
-
-  cart = [];
-  renderCart();
-  refreshExplorerFromSearch();
-  renderTable();
-  showToast(t('saleCompleted'), 'success');
 }
 
 async function completeSale() {
@@ -388,9 +396,7 @@ function beginPriceEdit(pid, currentPrice) {
     }
 
     saveToDB().then(function () {
-      refreshExplorerFromSearch();
-      renderCart();
-      renderTable();
+      refreshProductViews();
       showToast(t('priceUpdated'), 'success');
     });
   }

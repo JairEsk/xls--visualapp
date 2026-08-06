@@ -87,10 +87,14 @@ function renderRestock() {
         showToast('Please enter a valid amount', 'error');
         return;
       }
+      if (addAmount > 10000) {
+        showToast('Maximum restock amount is 10,000 units', 'error');
+        return;
+      }
       
       var prod = findProduct(id);
       if (prod) {
-        prod.stock = (Number(prod.stock) || 0) + addAmount;
+        prod.stock = Math.min(100000, (Number(prod.stock) || 0) + addAmount);
         try {
           await saveToDB();
           showToast(t('productUpdated'), 'success');

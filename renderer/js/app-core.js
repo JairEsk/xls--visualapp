@@ -469,6 +469,17 @@ function updateHelpDbName() {}
 function resetForm() {}
 
 function refreshProductViews() {
+  // Sync cart product references with the fresh products array
+  cart.forEach(function (item) {
+    var fresh = findProduct(item.product.id);
+    if (fresh) {
+      item.product = fresh;
+    }
+  });
+  // Remove cart items whose product no longer exists
+  cart = cart.filter(function (item) {
+    return !!findProduct(item.product.id);
+  });
   renderTable();
   renderRestock();
   renderCart();

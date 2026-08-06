@@ -1,5 +1,5 @@
 // ============================================================
-//  PAPE — Stationery Store Inventory Manager
+//  PAPE â€” Stationery Store Inventory Manager
 //  renderer.js  (front-end : i18n, explorer, inventory, modals)
 // ============================================================
 
@@ -75,8 +75,8 @@ var i18n = {
     productUpdated: 'Product updated.',
     productDeleted: 'Product deleted.',
     priceUpdated: 'Sale price updated.',
-    duplicateId: 'A product with that ID already exists. Fields have been filled — make your changes and click Update.',
-    duplicateBarcode: 'A product with this barcode already exists. Fields have been filled — make your changes and click Update.',
+    duplicateId: 'A product with that ID already exists. Fields have been filled â€” make your changes and click Update.',
+    duplicateBarcode: 'A product with this barcode already exists. Fields have been filled â€” make your changes and click Update.',
     deleteConfirmTitle: 'Delete Product',
     deleteConfirmDesc: 'Are you sure you want to delete',
     deleteConfirmBtn: 'Delete',
@@ -104,7 +104,7 @@ var i18n = {
     helpTitle: 'How to Create Your Own Excel File',
     helpText: 'If you want to manually prepare an Excel file instead of using the app to add products, create a',
     helpText2: 'file with the following column headers:',
-    helpHint: "The app auto-creates this file on first launch — you don't usually need to create one manually. Use",
+    helpHint: "The app auto-creates this file on first launch â€” you don't usually need to create one manually. Use",
     helpHint2: 'in the Inventory tab instead.',
     none: '(none)',
     dbManagerTitle: 'Projects',
@@ -126,7 +126,7 @@ var i18n = {
     productsCount: function (n) { return n + ' product' + (n !== 1 ? 's' : ''); },
     boxBadgeTitle: function (units) { return units + ' units/box'; },
     restockTitle: 'Low Stock Products',
-    restockThreshold: '≤ 5 units',
+    restockThreshold: 'â‰¤ 5 units',
     restockEmpty: 'All products are well stocked.',
     restockUnitsLeft: function (n) { return n + ' left'; },
     addToCartBtn: 'Add',
@@ -165,7 +165,7 @@ var i18n = {
     tabProjectsText: 'Base de Datos',
     tabConfigsText: 'Ajustes',
     configsTitle: 'Ajustes y Tema',
-    configsStoreName: 'Nombre de la Papelería',
+    configsStoreName: 'Nombre de la PapelerÃ­a',
     configsThemeColor: 'Color de Acento del Tema',
     configsSaveBtn: 'Guardar Cambios',
     configsThemeCustom: 'Color Personalizado',
@@ -178,10 +178,10 @@ var i18n = {
     addProduct: 'Agregar Producto',
     editProduct: 'Editar Producto',
     name: 'Nombre',
-    namePlaceholder: 'ej. Lápiz HB #2',
-    barcode: 'Código de Barras',
+    namePlaceholder: 'ej. LÃ¡piz HB #2',
+    barcode: 'CÃ³digo de Barras',
     barcodePlaceholder: 'ej. 7501234567890',
-    category: 'Categoría',
+    category: 'CategorÃ­a',
     categorySelect: 'Seleccionar...',
     categories: {
       Writing: 'Escritura', Notebooks: 'Cuadernos', Art: 'Arte',
@@ -206,7 +206,7 @@ var i18n = {
     searchPlaceholder: 'Buscar productos...',
     explorerSearch: 'Buscar o escanear producto...',
     explorerEmpty: 'Busca un producto para ver su precio.',
-    noProducts: 'Sin productos aún. Agrega uno en la pestaña Inventario.',
+    noProducts: 'Sin productos aÃºn. Agrega uno en la pestaÃ±a Inventario.',
     id: 'ID',
     purch: 'Compra',
     sale: 'Venta',
@@ -223,20 +223,20 @@ var i18n = {
     productUpdated: 'Producto actualizado.',
     productDeleted: 'Producto eliminado.',
     priceUpdated: 'Precio de venta actualizado.',
-    duplicateId: 'Ya existe un producto con ese ID. Campos rellenados — haz tus cambios y presiona Actualizar.',
-    duplicateBarcode: 'Ya existe un producto con ese código de barras. Campos rellenados — haz tus cambios y presiona Actualizar.',
+    duplicateId: 'Ya existe un producto con ese ID. Campos rellenados â€” haz tus cambios y presiona Actualizar.',
+    duplicateBarcode: 'Ya existe un producto con ese cÃ³digo de barras. Campos rellenados â€” haz tus cambios y presiona Actualizar.',
     deleteConfirmTitle: 'Eliminar Producto',
-    deleteConfirmDesc: '¿Estás seguro de eliminar',
+    deleteConfirmDesc: 'Â¿EstÃ¡s seguro de eliminar',
     deleteConfirmBtn: 'Eliminar',
     saleConfirmTitle: 'Completar Venta',
-    saleConfirmDesc: '¿Estás seguro de completar esta venta?',
+    saleConfirmDesc: 'Â¿EstÃ¡s seguro de completar esta venta?',
     saleConfirmBtn: 'Completar Venta',
     lblConfirmTotal: 'Total:',
     lblCashReceived: 'Dinero Recibido',
     lblChangeDue: 'Cambio / Vuelto',
     insufficientCash: 'Dinero Insuficiente',
     nameRequired: 'El nombre del producto es obligatorio.',
-    newProjectConfirm: '¿Iniciar un nuevo proyecto? Se borrarán todos los productos actuales.',
+    newProjectConfirm: 'Â¿Iniciar un nuevo proyecto? Se borrarÃ¡n todos los productos actuales.',
     newProjectCleared: 'Nuevo proyecto iniciado. Todos los productos fueron eliminados.',
     newProjectTitle: 'Nuevo Proyecto',
     newProjectDesc: 'Ingresa un nombre para la nueva base de datos.',
@@ -249,32 +249,32 @@ var i18n = {
     importFailed: 'Error al importar.',
     dbLoadError: 'Error al cargar productos.',
     dbSaveError: 'Error al guardar productos.',
-    helpTitle: 'Cómo Crear tu Propio Archivo Excel',
+    helpTitle: 'CÃ³mo Crear tu Propio Archivo Excel',
     helpText: 'Si quieres preparar manualmente un archivo Excel en vez de usar la app para agregar productos, crea un archivo',
     helpText2: 'con las siguientes columnas:',
-    helpHint: 'La app crea este archivo automáticamente al iniciar — normalmente no necesitas crearlo manualmente. Usa',
-    helpHint2: 'en la pestaña Inventario.',
+    helpHint: 'La app crea este archivo automÃ¡ticamente al iniciar â€” normalmente no necesitas crearlo manualmente. Usa',
+    helpHint2: 'en la pestaÃ±a Inventario.',
     none: '(ninguno)',
     dbManagerTitle: 'Proyectos',
     currentProject: 'Actual:',
-    dbListEmptyText: 'Sin proyectos aún.',
+    dbListEmptyText: 'Sin proyectos aÃºn.',
     switchTo: 'Proyecto cambiado: ',
-    schemaHeaderCol: 'Columna', schemaHeaderType: 'Tipo', schemaHeaderDesc: 'Descripción',
-    schemaId: 'Identificador único del producto',
-    schemaBarcode: 'Código de barras (UPC/EAN)',
+    schemaHeaderCol: 'Columna', schemaHeaderType: 'Tipo', schemaHeaderDesc: 'DescripciÃ³n',
+    schemaId: 'Identificador Ãºnico del producto',
+    schemaBarcode: 'CÃ³digo de barras (UPC/EAN)',
     schemaName: 'Nombre del producto',
-    schemaCategory: 'Categoría',
+    schemaCategory: 'CategorÃ­a',
     schemaPurchasePrice: 'Costo unitario de compra',
     schemaSalePrice: 'Precio unitario de venta',
     schemaStock: 'Unidades en inventario',
-    schemaSoldByBox: 'Si también se vende por caja',
+    schemaSoldByBox: 'Si tambiÃ©n se vende por caja',
     schemaBoxUnits: 'Unidades por caja',
     schemaBoxPurchasePrice: 'Costo de compra por caja',
     schemaBoxSalePrice: 'Precio de venta por caja',
     productsCount: function (n) { return n + ' producto' + (n !== 1 ? 's' : ''); },
     boxBadgeTitle: function (units) { return units + ' unidades/caja'; },
     restockTitle: 'Productos con Bajo Stock',
-    restockThreshold: '≤ 5 unidades',
+    restockThreshold: 'â‰¤ 5 unidades',
     restockEmpty: 'Todos los productos tienen buen stock.',
     restockUnitsLeft: function (n) { return n + ' restantes'; },
     addToCartBtn: 'Agregar',
@@ -289,7 +289,7 @@ var i18n = {
     cartItems: function (n) { return n + ' producto' + (n !== 1 ? 's' : ''); },
     tabSales: 'Historial',
     salesTitle: 'Historial de Ventas',
-    salesEmpty: 'No hay ventas registradas aún.',
+    salesEmpty: 'No hay ventas registradas aÃºn.',
     salesCountLabel: 'Ventas',
     salesRevenueLabel: 'Ingresos',
     salesAvgLabel: 'Ticket Prom.',
@@ -469,6 +469,17 @@ function updateHelpDbName() {}
 function resetForm() {}
 
 function refreshProductViews() {
+  // Sync cart product references with the fresh products array
+  cart.forEach(function (item) {
+    var fresh = findProduct(item.product.id);
+    if (fresh) {
+      item.product = fresh;
+    }
+  });
+  // Remove cart items whose product no longer exists
+  cart = cart.filter(function (item) {
+    return !!findProduct(item.product.id);
+  });
   renderTable();
   renderRestock();
   renderCart();

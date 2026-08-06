@@ -132,7 +132,7 @@ function getFormData() {
     category:         categorySelect ? categorySelect.value.trim() : '',
     purchasePrice:    parseFloat(purchasePriceInput ? purchasePriceInput.value : 0) || 0,
     salePrice:        parseFloat(salePriceInput ? salePriceInput.value : 0) || 0,
-    stock:            parseInt(stockInput ? stockInput.value : 0) || 0,
+    stock:            Math.max(0, parseInt(stockInput ? stockInput.value : 0) || 0),
     soldByBox:        soldByBox,
     boxUnits:         soldByBox ? (parseInt(boxUnitsInput ? boxUnitsInput.value : 0) || 0) : 0,
     boxPurchasePrice: soldByBox ? (parseFloat(boxPurchasePriceInput ? boxPurchasePriceInput.value : 0) || 0) : 0,
@@ -214,7 +214,7 @@ if (form) {
 
     await saveToDB();
     resetForm();
-    renderTable();
+    refreshProductViews();
     switchTab('inventory');
   });
 }
@@ -286,8 +286,7 @@ if (deleteConfirmBtn) {
     products = products.filter(function (x) { return x.id !== pendingDeleteId; });
     cart = cart.filter(function (item) { return item.product.id !== pendingDeleteId; });
     await saveToDB();
-    renderCart();
-    renderTable();
+    refreshProductViews();
     closeDeleteModal();
     showToast(t('productDeleted'), 'info');
   });
@@ -345,8 +344,7 @@ if (modalImportBtn) {
       showToast(t('importedOk'), 'info');
       await loadFromDB();
       cart = [];
-      renderCart();
-      renderTable();
+      refreshProductViews();
       var projectOverlay = $id('projectsOverlay');
       if (projectOverlay) projectOverlay.classList.add('hidden');
     } catch (err) { console.error(err); showToast(t('importFailed'), 'error'); }

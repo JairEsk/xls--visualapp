@@ -66,7 +66,7 @@ function renderRestock() {
           '<span class="id-tag">#' + p.id + '</span>' +
           '<div class="restock-quick-add">' +
             '<input type="number" class="restock-quick-input" id="restockInput_' + p.id + '" value="10" min="1" step="1">' +
-            '<button class="btn-quick-restock" data-id="' + p.id + '" title="Restock">📥</button>' +
+            '<button class="btn-quick-restock" data-id="' + p.id + '" title="Restock">ðŸ“¥</button>' +
           '</div>' +
         '</div>' +
       '</div>';
@@ -87,10 +87,14 @@ function renderRestock() {
         showToast('Please enter a valid amount', 'error');
         return;
       }
+      if (addAmount > 10000) {
+        showToast('Maximum restock amount is 10,000 units', 'error');
+        return;
+      }
       
       var prod = findProduct(id);
       if (prod) {
-        prod.stock = (Number(prod.stock) || 0) + addAmount;
+        prod.stock = Math.min(100000, (Number(prod.stock) || 0) + addAmount);
         try {
           await saveToDB();
           showToast(t('productUpdated'), 'success');

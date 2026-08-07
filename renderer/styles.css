@@ -82,9 +82,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 900;
-  background:
-    radial-gradient(circle at 18% 0%, rgba(255, 253, 248, 0.10), transparent 34%),
-    linear-gradient(180deg, #263834 0%, var(--header-bg) 100%);
+  background: var(--header-bg);
   color: #fffdf8;
   flex-shrink: 0;
   box-shadow: 0 10px 28px rgba(36, 49, 47, 0.16);

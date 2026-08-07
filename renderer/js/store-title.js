@@ -94,13 +94,27 @@ function applyThemeColor(hex) {
     gh.toString(16).padStart(2, '0') +
     bh.toString(16).padStart(2, '0');
 
+  // Calculate a dark variant for the header background (darken by 40-50%)
+  var rHeader = Math.max(20, Math.floor(r * 0.5));
+  var gHeader = Math.max(25, Math.floor(g * 0.5));
+  var bHeader = Math.max(23, Math.floor(b * 0.5));
+  var headerBgHex = '#' +
+    rHeader.toString(16).padStart(2, '0') +
+    gHeader.toString(16).padStart(2, '0') +
+    bHeader.toString(16).padStart(2, '0');
+
   var root = document.documentElement;
   root.style.setProperty('--primary', hex);
   root.style.setProperty('--primary-hover', hoverHex);
   root.style.setProperty('--primary-light', 'rgba(' + r + ', ' + g + ', ' + b + ', 0.10)');
   root.style.setProperty('--primary-border', 'rgba(' + r + ', ' + g + ', ' + b + ', 0.24)');
+  root.style.setProperty('--header-bg', headerBgHex);
 
   localStorage.setItem('themeColor', hex);
+
+  if (window.api && window.api.updateTitleBar) {
+    window.api.updateTitleBar(headerBgHex, '#fffdf8');
+  }
 
   // Highlight active preset button
   var presetBtns = document.querySelectorAll('.color-preset-btn');

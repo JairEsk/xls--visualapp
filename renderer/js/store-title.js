@@ -106,8 +106,8 @@ function applyThemeColor(hex) {
   var root = document.documentElement;
   root.style.setProperty('--primary', hex);
   root.style.setProperty('--primary-hover', hoverHex);
-  root.style.setProperty('--primary-light', 'rgba(' + r + ', ' + g + ', ' + b + ', 0.10)');
-  root.style.setProperty('--primary-border', 'rgba(' + r + ', ' + g + ', ' + b + ', 0.24)');
+  root.style.setProperty('--primary-light', hex + '1a'); // HEX8 format for 10% opacity
+  root.style.setProperty('--primary-border', hex + '3d'); // HEX8 format for 24% opacity
   root.style.setProperty('--header-bg', headerBgHex);
 
   localStorage.setItem('themeColor', hex);

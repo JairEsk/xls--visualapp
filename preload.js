@@ -9,5 +9,6 @@ contextBridge.exposeInMainWorld('api', {
   getHeaders: () => ipcRenderer.invoke('db:getHeaders'),
   listDatabases: () => ipcRenderer.invoke('db:listDatabases'),
   openExcel: () => ipcRenderer.invoke('dialog:openExcel'),
-  saveExcel: () => ipcRenderer.invoke('dialog:saveExcel')
+  saveExcel: () => ipcRenderer.invoke('dialog:saveExcel'),
+  updateTitleBar: (color, symbolColor) => ipcRenderer.invoke('window:updateTitleBar', { color, symbolColor })
 });

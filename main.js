@@ -64,6 +64,14 @@ ipcMain.handle('db:getHeaders', async () => {
   return HEADERS;
 });
 
+ipcMain.handle('window:updateTitleBar', async (_event, { color, symbolColor }) => {
+  if (mainWindow) {
+    mainWindow.setTitleBarOverlay({ color, symbolColor });
+    return true;
+  }
+  return false;
+});
+
 ipcMain.handle('db:listDatabases', async () => {
   const fs = require('fs');
   const path = require('path');
